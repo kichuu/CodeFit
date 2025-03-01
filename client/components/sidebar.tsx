@@ -50,8 +50,8 @@ export function Sidebar() {
   ]
 
   return (
-    <div className="flex h-screen w-16 flex-col justify-between border-r bg-background p-3 md:w-64">
-      <div className="space-y-4">
+    <div className="fixed left-0 top-0 h-screen w-16 flex flex-col border-r bg-background p-3 md:w-64">
+      <div className="space-y-4 flex-grow">
         <div className="flex h-16 items-center justify-center md:justify-start">
           <Link href="/" className="flex items-center gap-2">
             <GitHubIcon className="h-8 w-8" />
@@ -74,11 +74,10 @@ export function Sidebar() {
           ))}
         </nav>
       </div>
-      <div className="flex flex-col items-center gap-2 md:items-start">
+      <div className="mt-auto flex flex-col items-center gap-2 md:items-start">
         <ThemeToggle />
         <div className="hidden md:block text-xs text-muted-foreground">© 2025 GitHub Recruiter</div>
       </div>
     </div>
   )
 }
-

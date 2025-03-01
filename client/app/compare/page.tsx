@@ -6,7 +6,7 @@ import { CompareRecommendation } from "@/components/compare-recommendation"
 
 export default function ComparePage() {
   return (
-    <div className="space-y-6">
+    <div className="p-4 pl-16 md:pl-64 space-y-6">
       <div>
         <h1 className="text-3xl font-bold tracking-tight">Compare Candidates</h1>
         <p className="text-muted-foreground">Side-by-side comparison of GitHub candidates</p>
@@ -58,4 +58,3 @@ export default function ComparePage() {
     </div>
   )
 }
-

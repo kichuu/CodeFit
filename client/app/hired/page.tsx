@@ -5,11 +5,13 @@ import { HiredStats } from "@/components/hired-stats"
 
 export default function HiredPage() {
   return (
-    <div className="space-y-6">
+    <div className="p-4 pl-16 md:pl-64 space-y-6">
       <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Hired Candidates</h1>
-          <p className="text-muted-foreground">View and analyze all hired GitHub candidates</p>
+          <p className="text-muted-foreground">
+            View and analyze all hired GitHub candidates
+          </p>
         </div>
         <CandidateSearch />
       </div>
@@ -22,4 +24,3 @@ export default function HiredPage() {
     </div>
   )
 }
-

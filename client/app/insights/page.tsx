@@ -6,10 +6,12 @@ import { InsightRecommendations } from "@/components/insight-recommendations"
 
 export default function InsightsPage() {
   return (
-    <div className="space-y-6">
+    <div className="p-4 pl-16 md:pl-64 space-y-6">
       <div>
         <h1 className="text-3xl font-bold tracking-tight">AI Insights</h1>
-        <p className="text-muted-foreground">AI-powered analysis of GitHub candidates and hiring trends</p>
+        <p className="text-muted-foreground">
+          AI-powered analysis of GitHub candidates and hiring trends
+        </p>
       </div>
 
       <div className="grid gap-6 md:grid-cols-2">
@@ -66,4 +68,3 @@ export default function InsightsPage() {
     </div>
   )
 }
-

@@ -4,11 +4,13 @@ import { CandidateFilters } from "@/components/candidate-filters"
 
 export default function CandidatesPage() {
   return (
-    <div className="space-y-6">
+    <div className="p-4 pl-16 md:pl-64 space-y-6">
       <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Candidates</h1>
-          <p className="text-muted-foreground">Browse and filter all analyzed GitHub candidates</p>
+          <p className="text-muted-foreground">
+            Browse and filter all analyzed GitHub candidates
+          </p>
         </div>
         <CandidateSearch />
       </div>
@@ -19,4 +21,3 @@ export default function CandidatesPage() {
     </div>
   )
 }
-

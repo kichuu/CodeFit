@@ -4,14 +4,15 @@ import { CandidateTable } from "@/components/candidate-table"
 import { DashboardStats } from "@/components/dashboard-stats"
 import { RecentActivity } from "@/components/recent-activity"
 import { SetBenchmarkForm } from "@/components/set-benchmark-form"
-
 export default function Dashboard() {
   return (
-    <div className="space-y-6">
+    <div className="p-4 pl-16 md:pl-64 space-y-6">
       <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
-          <p className="text-muted-foreground">Overview of all analyzed candidates and recruiting metrics</p>
+          <p className="text-muted-foreground">
+            Overview of all analyzed candidates and recruiting metrics
+          </p>
         </div>
         <CandidateSearch />
       </div>
@@ -42,7 +43,9 @@ export default function Dashboard() {
         <Card className="md:col-span-3">
           <CardHeader>
             <CardTitle>Set Benchmark</CardTitle>
-            <CardDescription>Use a GitHub profile as a benchmark for candidate comparisons</CardDescription>
+            <CardDescription>
+              Use a GitHub profile as a benchmark for candidate comparisons
+            </CardDescription>
           </CardHeader>
           <CardContent>
             <SetBenchmarkForm />

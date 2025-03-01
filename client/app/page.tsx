@@ -3,6 +3,7 @@ import { CandidateSearch } from "@/components/candidate-search"
 import { CandidateTable } from "@/components/candidate-table"
 import { DashboardStats } from "@/components/dashboard-stats"
 import { RecentActivity } from "@/components/recent-activity"
+import { SetBenchmarkForm } from "@/components/set-benchmark-form"
 
 export default function Dashboard() {
   return (
@@ -37,8 +38,17 @@ export default function Dashboard() {
             <RecentActivity />
           </CardContent>
         </Card>
+
+        <Card className="md:col-span-3">
+          <CardHeader>
+            <CardTitle>Set Benchmark</CardTitle>
+            <CardDescription>Use a GitHub profile as a benchmark for candidate comparisons</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <SetBenchmarkForm />
+          </CardContent>
+        </Card>
       </div>
     </div>
   )
 }
-

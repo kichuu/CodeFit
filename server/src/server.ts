@@ -3,9 +3,10 @@ import dotenv from "dotenv";
 import { connectDB } from "./config/db";
 import candidateRoutes from "./routes/candidateRoutes";
 import authRoutes from "./routes/authRoutes";
-
+import cors from "cors"
 dotenv.config();
 const app = express();
+app.use(cors())
 
 // Middleware
 app.use(express.json());

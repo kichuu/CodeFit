@@ -15,6 +15,7 @@ interface Candidate {
   avatar: string;
   topLanguages: string[];
   status: string;
+  matchPercent: number;
 }
 
 interface CandidateTableProps {
@@ -85,7 +86,7 @@ export function CandidateTable({ limit }: CandidateTableProps) {
             <TableCell>
               <div className="flex items-center">
                 <span className="mr-2 h-2 w-2 rounded-full bg-gray-400"></span>
-                <span>0%</span>
+                <span>{candidate.matchPercent}</span>
               </div>
             </TableCell>
             <TableCell className="hidden md:table-cell">

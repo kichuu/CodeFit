@@ -83,7 +83,7 @@ export default function CandidateProfile() {
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="text-center">
-              <MatchScore score={candidate.matchScore || 0} />
+              <MatchScore score={candidate.matchPercent || 0} />
             </div>
 
             <div className="space-y-2">
@@ -143,7 +143,6 @@ export default function CandidateProfile() {
                 <TabsTrigger value="activity">Activity</TabsTrigger>
               </TabsList>
               <TabsContent value="overview" className="space-y-6 mt-4">
-                <StrengthsWeaknesses strengths={candidate.strengths || []} weaknesses={candidate.weaknesses || []} />
                 <LanguageChart username={username} />
               </TabsContent>
               <TabsContent value="contributions" className="mt-4">

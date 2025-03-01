@@ -6,8 +6,8 @@ const router = express.Router();
 
 router.post("/", authMiddleware,addCandidate);
 // router.get("/",authMiddleware ,getCandidates);
-router.get("/",authMiddleware ,getCandidates);
-router.get("/comp",authMiddleware ,getCandidatesForCompany);
+// router.get("/",authMiddleware ,getCandidates);
+router.get("/",authMiddleware ,getCandidatesForCompany);
 
 
 

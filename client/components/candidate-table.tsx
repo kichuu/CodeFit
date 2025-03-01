@@ -32,7 +32,7 @@ export function CandidateTable({ limit }: CandidateTableProps) {
         const token = localStorage.getItem("token") // Get token from localStorage
         if (!token) throw new Error("No token found, please log in.")
           console.log(token)
-        const res = await fetch("http://localhost:5000/api/candidates/comp", {
+        const res = await fetch("http://localhost:5000/api/candidates/", {
           method: "GET",
           headers: {
             "Authorization": `Bearer ${token}`, // Attach token in Authorization header

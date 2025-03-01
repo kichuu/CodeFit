@@ -1,74 +1,81 @@
 "use client"
 
 import type React from "react"
-
 import { useState } from "react"
+import { useRouter } from "next/navigation" // Import useRouter for redirection
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Switch } from "@/components/ui/switch"
 import { GitHubLogoIcon } from "@radix-ui/react-icons"
 
 export function AddCandidateForm() {
   const [githubLink, setGithubLink] = useState("")
-  const [manualName, setManualName] = useState("")
-  const [manualEmail, setManualEmail] = useState("")
   const [useAI, setUseAI] = useState(true)
+  const [loading, setLoading] = useState(false)
+  const router = useRouter() // Initialize Next.js router
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    // Here you would handle the form submission, including the API call to process the candidate
-    console.log("Form submitted", {
-      githubLink,
-      manualName,
-      manualEmail,
-      useAI,
-    })
+    if (!githubLink.trim()) return
+
+    setLoading(true)
+    try {
+      const token = localStorage.getItem("token") || "" // Fetch JWT from localStorage
+
+      const response = await fetch("http://localhost:5000/api/candidates/", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ githubUrl: githubLink }),
+      })
+
+      if (!response.ok) {
+        throw new Error("Failed to add candidate")
+      }
+
+      // Extract GitHub username from the URL
+      const username = githubLink.split("github.com/")[1]
+
+      console.log("Candidate added successfully:", username)
+      setGithubLink("") // Clear input field
+
+      // Redirect to the candidate page
+      router.push(`http://localhost:3000/candidates/${username}`)
+    } catch (error) {
+      console.error("Error:", error)
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
     <form onSubmit={handleSubmit} className="space-y-8">
-      <Tabs defaultValue="github" className="w-full">
-        <TabsList>
-          <TabsTrigger value="github">GitHub Profile</TabsTrigger>
-          <TabsTrigger value="manual">Manual Input</TabsTrigger>
-        </TabsList>
-        <TabsContent value="github" className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="github-link">GitHub Profile URL</Label>
-            <div className="flex w-full max-w-sm items-center space-x-2">
-              <Input
-                type="url"
-                id="github-link"
-                placeholder="https://github.com/username"
-                value={githubLink}
-                onChange={(e) => setGithubLink(e.target.value)}
-              />
-              <Button type="submit">
-                <GitHubLogoIcon className="mr-2 h-4 w-4" />
-                Add
-              </Button>
-            </div>
-          </div>
-        </TabsContent>
-        <TabsContent value="manual" className="space-y-4">
-          <div className="grid w-full max-w-sm items-center gap-1.5">
-            <Label htmlFor="manual-name">Name</Label>
-            <Input type="text" id="manual-name" value={manualName} onChange={(e) => setManualName(e.target.value)} />
-          </div>
-          <div className="grid w-full max-w-sm items-center gap-1.5">
-            <Label htmlFor="manual-email">Email</Label>
+      <div className="space-y-4">
+        <div className="space-y-2">
+          <Label htmlFor="github-link">GitHub Profile URL</Label>
+          <div className="flex w-full max-w-sm items-center space-x-2">
             <Input
-              type="email"
-              id="manual-email"
-              value={manualEmail}
-              onChange={(e) => setManualEmail(e.target.value)}
+              type="url"
+              id="github-link"
+              placeholder="https://github.com/username"
+              value={githubLink}
+              onChange={(e) => setGithubLink(e.target.value)}
+              required
             />
+            <Button type="submit" disabled={loading}>
+              {loading ? "Adding..." : (
+                <>
+                  <GitHubLogoIcon className="mr-2 h-4 w-4" />
+                  Add
+                </>
+              )}
+            </Button>
           </div>
-          <Button type="submit">Add Candidate</Button>
-        </TabsContent>
-      </Tabs>
+        </div>
+      </div>
 
       <div className="flex items-center space-x-2">
         <Switch id="use-ai" checked={useAI} onCheckedChange={setUseAI} />

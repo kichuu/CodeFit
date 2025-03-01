@@ -27,6 +27,7 @@ interface GitHubData {
   totalPRs: number;
   totalIssues: number;
   commitQualityScore: number;
+  openSourceContributed:String;
 }
 
 // Function to calculate commit message quality score
@@ -75,98 +76,94 @@ function calculateCommitQuality(commitMessages: string[]): number {
 
 
 export async function fetchGitHubData(username: string): Promise<GitHubData | null> {
-  try {
-    // Fetch user profile details
-    const userResponse = await axios.get(`https://api.github.com/users/${username}`, { headers });
-    const user = userResponse.data;
-
-    // Initialize user data object
-    let userData: GitHubData = {
-      username,
-      name: user.name || username,
-      avatar: user.avatar_url,
-      bio: user.bio,
-      location: user.location,
-      joinedGithub: user.created_at,
-      totalCommits: 0,
-      totalPRs: 0,
-      totalIssues: 0,
-      commitQualityScore: 0,
-      topLanguages: [],
-    };
-
-    // Fetch repositories
-    const reposResponse = await axios.get(`https://api.github.com/users/${username}/repos?per_page=100`, { headers });
-    const repos = reposResponse.data;
-
-    let allCommitMessages: string[] = [];
-    let languageCount: Record<string, number> = {};
-
-    for (const repo of repos) {
-      const repoName: string = repo.name;
-
-      // Fetch commit history
-      try {
-        const commitsResponse = await axios.get(`https://api.github.com/repos/${username}/${repoName}/commits?per_page=100`, { headers });
-        const commits = commitsResponse.data;
-
-        const commitMessages = commits.map((commit: { commit: { message: string } }) => commit.commit.message);
-        allCommitMessages.push(...commitMessages);
-
-        userData.totalCommits += commits.length;
-      } catch (error: any) {
-        if (error.response?.status === 409) {
-          console.log(`⚠ Skipping empty repo: ${repoName}`);
-        } else {
-          console.error(`❌ Error fetching commits for ${repoName}:`, error.response?.data || error.message);
-        }
-      }
-
-      // Fetch repository languages
-      try {
-        const languagesResponse = await axios.get(`https://api.github.com/repos/${username}/${repoName}/languages`, { headers });
-        const repoLanguages: { [key: string]: number } = languagesResponse.data;
-
-        for (const [lang, bytes] of Object.entries(repoLanguages)) {
-          languageCount[lang] = (languageCount[lang] || 0) + bytes;
-        }
-      } catch (error) {
-        console.error(`❌ Error fetching languages for ${repoName}:`, error);
-      }
-    }
-
-    // Determine top languages (sorted by usage)
-    userData.topLanguages = Object.entries(languageCount)
-      .sort((a, b) => b[1] - a[1])
-      .map(([lang]) => lang)
-      .slice(0, 5); // Top 5 languages
-
-    // Fetch total PRs
     try {
-      const prsResponse = await axios.get(`https://api.github.com/search/issues?q=author:${username}+type:pr`, { headers });
-      userData.totalPRs = prsResponse.data.total_count;
-    } catch (error) {
-      console.error(`❌ Error fetching PRs for ${username}:`, error);
+      // Fetch user profile details
+      const userResponse = await axios.get(`https://api.github.com/users/${username}`, { headers });
+      const user = userResponse.data;
+  
+      let userData: GitHubData = {
+        username,
+        name: user.name || username,
+        avatar: user.avatar_url,
+        bio: user.bio,
+        location: user.location,
+        joinedGithub: user.created_at,
+        totalCommits: 0,
+        totalPRs: 0,
+        totalIssues: 0,
+        commitQualityScore: 0,
+        topLanguages: [],
+        openSourceContributed: "No", // Default to "No"
+      };
+  
+      // Fetch repositories
+      const reposResponse = await axios.get(`https://api.github.com/users/${username}/repos?per_page=100`, { headers });
+      const repos = reposResponse.data.map((repo: { name: string }) => repo.name);
+      
+      let allCommitMessages: string[] = [];
+      let languageCount: Record<string, number> = {};
+  
+      for (const repo of repos) {
+        try {
+          // Fetch commit history
+          const commitsResponse = await axios.get(`https://api.github.com/repos/${username}/${repo}/commits?per_page=100`, { headers });
+          const commits = commitsResponse.data;
+  
+          allCommitMessages.push(...commits.map((commit: { commit: { message: string } }) => commit.commit.message));
+          userData.totalCommits += commits.length;
+        } catch (error: any) {
+          if (error.response?.status === 409) console.log(`⚠ Skipping empty repo: ${repo}`);
+        }
+  
+        // Fetch repository languages
+        try {
+          const languagesResponse = await axios.get(`https://api.github.com/repos/${username}/${repo}/languages`, { headers });
+          for (const [lang, bytes] of Object.entries(languagesResponse.data)) {
+            languageCount[lang] = (languageCount[lang] || 0) + (bytes as number);
+          }
+        } catch (error) {}
+      }
+  
+      // Determine top languages
+      userData.topLanguages = Object.entries(languageCount)
+        .sort((a, b) => b[1] - a[1])
+        .map(([lang]) => lang)
+        .slice(0, 5);
+  
+      // Fetch total PRs
+      try {
+        const prsResponse = await axios.get(`https://api.github.com/search/issues?q=author:${username}+type:pr`, { headers });
+        userData.totalPRs = prsResponse.data.total_count;
+      } catch (error) {}
+  
+      // Fetch total Issues (excluding PRs)
+      try {
+        const issuesResponse = await axios.get(`https://api.github.com/search/issues?q=author:${username}+type:issue`, { headers });
+        userData.totalIssues = issuesResponse.data.total_count;
+      } catch (error) {}
+  
+      // Detect Open Source Contribution (PRs to external repos)
+      try {
+        const externalPRsResponse = await axios.get(
+          `https://api.github.com/search/issues?q=author:${username}+type:pr -repo:${username}`,
+          { headers }
+        );
+        if (externalPRsResponse.data.total_count > 0) {
+          userData.openSourceContributed = "Yes"; // If PRs exist outside their own repos
+        }
+      } catch (error) {}
+  
+      // Calculate commit quality score
+      userData.commitQualityScore = calculateCommitQuality(allCommitMessages);
+  
+      console.log("📊 GitHub Data:", JSON.stringify(userData, null, 2));
+      return userData;
+    } catch (error: any) {
+      console.error("❌ Error fetching GitHub data:", error.response?.data || error.message);
+      return null;
     }
-
-    // Fetch total Issues (excluding PRs)
-    try {
-      const issuesResponse = await axios.get(`https://api.github.com/search/issues?q=author:${username}+type:issue`, { headers });
-      userData.totalIssues = issuesResponse.data.total_count;
-    } catch (error) {
-      console.error(`❌ Error fetching issues for ${username}:`, error);
-    }
-
-    // Calculate commit quality score
-    userData.commitQualityScore = calculateCommitQuality(allCommitMessages);
-
-    console.log("📊 GitHub Data:", JSON.stringify(userData, null, 2));
-    return userData;
-  } catch (error: any) {
-    console.error("❌ Error fetching GitHub data:", error.response?.data || error.message);
-    return null;
   }
-}
+  
 
 
 
@@ -187,7 +184,7 @@ export const addCandidate = async (req: Request, res: Response): Promise<void> =
         return;
       }
   
-      // Use GitHub data and save it to the database
+      // Save GitHub data in the database
       const newCandidate = new Candidate({
         username,
         name: gitHubData.name,
@@ -200,6 +197,7 @@ export const addCandidate = async (req: Request, res: Response): Promise<void> =
         totalPRs: gitHubData.totalPRs,
         totalIssues: gitHubData.totalIssues,
         commitQualityScore: gitHubData.commitQualityScore,
+        openSourceContributed: gitHubData.openSourceContributed, // ✅ Added this field
       });
   
       await newCandidate.save();
@@ -208,6 +206,7 @@ export const addCandidate = async (req: Request, res: Response): Promise<void> =
       res.status(500).json({ message: (error as Error).message });
     }
   };
+  
   
 
 export const getCandidates = async (req: Request, res: Response)  => {

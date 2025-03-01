@@ -17,7 +17,9 @@ const candidateSchema = new mongoose.Schema(
     totalPRs: { type: Number, default: 0 },
     totalIssues: { type: Number, default: 0 },
     commitQualityScore: { type: Number, default: 0 },
-
+    openSourceContributed : {type: String, enum: ["No", "Yes"] ,default: "No"},
+    totalRepos:{ type: Number},
+    teamProjects : {type:Number},
     createdAt: { type: Date, default: Date.now },
     updatedAt: { type: Date, default: Date.now },
   },

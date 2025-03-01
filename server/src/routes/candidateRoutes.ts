@@ -1,10 +1,14 @@
 import express from "express";
-import { addCandidate, getCandidates, getCandidate } from "../controllers/candidateController";
+import { addCandidate, getCandidates, getCandidate, getCandidatesForCompany } from "../controllers/candidateController";
+import { authMiddleware } from "../middleware/auth";
 
 const router = express.Router();
 
-router.post("/", addCandidate);
-router.get("/", getCandidates);
+router.post("/", authMiddleware,addCandidate);
+// router.get("/",authMiddleware ,getCandidates);
+router.get("/",authMiddleware ,getCandidatesForCompany);
+
+
 router.get("/:username", getCandidate);
 
 export default router;

@@ -1,120 +1,115 @@
-import { Badge } from "@/components/ui/badge"
-import { GitCommitIcon, GitPullRequestIcon, MessageSquareIcon } from "lucide-react"
+import { useEffect, useState } from "react";
+import { GitCommitIcon } from "lucide-react";
 
 interface ActivityTimelineProps {
-  username: string
+  username: string;
+}
+
+interface Activity {
+  id: string;
+  repo: string;
+  message: string;
+  timestamp: string;
+  date: Date;
 }
 
 export function ActivityTimeline({ username }: ActivityTimelineProps) {
-  // This would be fetched from an API in a real application
-  const activities = [
-    {
-      id: 1,
-      type: "commit",
-      repo: "next-app",
-      message: "Fix responsive layout issues",
-      timestamp: "2 days ago",
-    },
-    {
-      id: 2,
-      type: "pull_request",
-      repo: "next-app",
-      message: "Add dark mode support",
-      status: "merged",
-      timestamp: "3 days ago",
-    },
-    {
-      id: 3,
-      type: "issue",
-      repo: "ui-library",
-      message: "Button component not working in Safari",
-      status: "open",
-      timestamp: "5 days ago",
-    },
-    {
-      id: 4,
-      type: "commit",
-      repo: "ui-library",
-      message: "Update documentation",
-      timestamp: "1 week ago",
-    },
-    {
-      id: 5,
-      type: "pull_request",
-      repo: "api-service",
-      message: "Implement user authentication",
-      status: "open",
-      timestamp: "1 week ago",
-    },
-    {
-      id: 6,
-      type: "issue",
-      repo: "api-service",
-      message: "Rate limiting not working correctly",
-      status: "closed",
-      timestamp: "2 weeks ago",
-    },
-  ]
+  const [activities, setActivities] = useState<Activity[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
 
-  const getActivityIcon = (type: string) => {
-    switch (type) {
-      case "commit":
-        return <GitCommitIcon className="h-4 w-4" />
-      case "pull_request":
-        return <GitPullRequestIcon className="h-4 w-4" />
-      case "issue":
-        return <MessageSquareIcon className="h-4 w-4" />
-      default:
-        return null
+  useEffect(() => {
+    const githubToken = process.env.NEXT_PUBLIC_GITHUB_TOKEN;
+    if (!githubToken) {
+      setError("GitHub token not found. Ensure NEXT_PUBLIC_GITHUB_TOKEN is set.");
+      setLoading(false);
+      return;
     }
-  }
 
-  const getStatusBadge = (activity: (typeof activities)[0]) => {
-    if ("status" in activity) {
-      switch (activity.status) {
-        case "open":
-          return (
-            <Badge variant="outline" className="text-green-500 border-green-500">
-              Open
-            </Badge>
-          )
-        case "closed":
-          return (
-            <Badge variant="outline" className="text-red-500 border-red-500">
-              Closed
-            </Badge>
-          )
-        case "merged":
-          return (
-            <Badge variant="outline" className="text-purple-500 border-purple-500">
-              Merged
-            </Badge>
-          )
-        default:
-          return null
+    const headers = {
+      Authorization: `token ${githubToken}`,
+      Accept: "application/vnd.github.v3+json",
+    };
+
+    const fetchLatestCommits = async (repos: any[]): Promise<Activity[]> => {
+      const commitPromises = repos.map(async (repo) => {
+        try {
+          const commitResponse = await fetch(
+            `https://api.github.com/repos/${repo.full_name}/commits?per_page=1`,
+            { headers }
+          );
+          if (!commitResponse.ok) return null;
+
+          const commitData = await commitResponse.json();
+          if (commitData.length === 0) return null;
+
+          const commitDate = new Date(commitData[0].commit.committer.date);
+
+          return {
+            id: commitData[0].sha,
+            repo: repo.full_name,
+            message: commitData[0].commit.message,
+            timestamp: commitDate.toLocaleString(),
+            date: commitDate,
+          };
+        } catch {
+          return null;
+        }
+      });
+
+      const results = await Promise.all(commitPromises);
+      return results.filter((commit): commit is Activity => commit !== null);
+    };
+
+    const fetchGitHubActivity = async () => {
+      try {
+        setLoading(true);
+
+        // Fetch user's repositories (excluding org-owned)
+        const reposResponse = await fetch(`https://api.github.com/users/${username}/repos?per_page=20`, { headers });
+        if (!reposResponse.ok) throw new Error(`GitHub API error: ${reposResponse.statusText}`);
+        const reposData = await reposResponse.json();
+
+        // Filter only personal repositories (not org-owned)
+        const userRepos = reposData.filter((repo: any) => !repo.fork && repo.owner.login === username);
+
+        // Fetch latest commits from these repositories
+        let commitActivities = await fetchLatestCommits(userRepos);
+
+        // Sort by date (latest first) and get the latest 10 activities
+        commitActivities = commitActivities.sort((a, b) => b.date.getTime() - a.date.getTime()).slice(0, 10);
+
+        setActivities(commitActivities);
+      } catch (err) {
+        console.error("Error fetching GitHub activity:", err);
+        setError(err instanceof Error ? err.message : "Failed to fetch GitHub activity");
+      } finally {
+        setLoading(false);
       }
+    };
+
+    if (username) {
+      fetchGitHubActivity();
     }
-    return null
-  }
+  }, [username]);
+
+  if (loading) return <p>Loading activity...</p>;
+  if (error) return <p className="text-red-500">{error}</p>;
 
   return (
     <div className="space-y-4">
       {activities.map((activity) => (
         <div key={activity.id} className="flex gap-3">
           <div className="flex h-8 w-8 items-center justify-center rounded-full bg-muted">
-            {getActivityIcon(activity.type)}
+            <GitCommitIcon className="h-4 w-4" />
           </div>
           <div className="space-y-1">
-            <div className="flex items-center gap-2">
-              <span className="font-medium">{activity.repo}</span>
-              {getStatusBadge(activity)}
-            </div>
+            <div className="font-medium">{activity.repo}</div>
             <p className="text-sm">{activity.message}</p>
             <p className="text-xs text-muted-foreground">{activity.timestamp}</p>
           </div>
         </div>
       ))}
     </div>
-  )
+  );
 }
-

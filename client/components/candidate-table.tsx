@@ -74,7 +74,7 @@ export function CandidateTable({ limit }: CandidateTableProps) {
         {displayCandidates.map((candidate) => (
           <TableRow key={candidate._id}>
             <TableCell>
-              <Link href={`/candidates/${candidate.username}`} className="flex items-center gap-3 hover:underline">
+              <Link href={`/candidates/:${candidate.username}`} className="flex items-center gap-3 hover:underline">
                 <Avatar className="h-8 w-8">
                   <AvatarImage src={candidate.avatar} alt={candidate.name} />
                   <AvatarFallback>{candidate.name.substring(0, 2)}</AvatarFallback>

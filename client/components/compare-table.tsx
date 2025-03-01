@@ -1,98 +1,138 @@
-import React from "react"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Badge } from "@/components/ui/badge"
+import React from "react";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 
-export function CompareTable() {
-  // This would be fetched from an API in a real application
-  const metrics = [
-    {
-      category: "Profile",
-      metrics: [
-        { name: "Match Score", johnDoe: "87%", janeDoe: "92%" },
-        { name: "GitHub Member Since", johnDoe: "May 2018", janeDoe: "Jan 2016" },
-        { name: "Repositories", johnDoe: "32", janeDoe: "48" },
-      ],
-    },
-    {
-      category: "Activity",
-      metrics: [
-        { name: "Commits (Last Year)", johnDoe: "245", janeDoe: "178" },
-        { name: "Pull Requests (Last Year)", johnDoe: "42", janeDoe: "65" },
-        { name: "Issues (Last Year)", johnDoe: "28", janeDoe: "37" },
-        { name: "Code Reviews (Last Year)", johnDoe: "35", janeDoe: "52" },
-      ],
-    },
-    {
-      category: "Languages",
-      metrics: [
-        { name: "Primary Language", johnDoe: "TypeScript", janeDoe: "Python" },
-        { name: "Secondary Languages", johnDoe: "JavaScript, Python", janeDoe: "TypeScript, Go" },
-      ],
-    },
-    {
-      category: "Collaboration",
-      metrics: [
-        { name: "Open Source Contributions", johnDoe: "Yes", janeDoe: "Yes" },
-        { name: "Team Projects", johnDoe: "8", janeDoe: "12" },
-        { name: "Average PR Size", johnDoe: "Medium", janeDoe: "Small" },
-        { name: "Code Review Thoroughness", johnDoe: "High", janeDoe: "Very High" },
-      ],
-    },
-  ]
+interface Candidate {
+  name: string;
+  username: string;
+  avatar: string;
+  matchScore: string;
+  joinedGithub: string;
+  totalRepos: number;
+  totalCommits: number;
+  totalPRs: number;
+  totalIssues: number;
+  codeReviewThoroughness: string;
+  openSourceContributed: string;
+  topLanguages: string[];
+  teamProjects: number;
+  avgPRSize: string;
+}
 
-  const getBadgeVariant = (value: string) => {
-    if (value.includes("%")) {
-      const score = Number.parseInt(value)
-      if (score >= 90) return "default"
-      if (score >= 80) return "secondary"
-      return "outline"
-    }
-    if (value === "High" || value === "Very High") return "default"
-    if (value === "Medium") return "secondary"
-    if (value === "Low") return "outline"
-    return null
-  }
+interface CompareTableProps {
+  candidates: Candidate[];
+}
 
+const categories = [
+  {
+    category: "Profile",
+    metrics: ["Match Score", "GitHub Member Since", "Repositories"],
+  },
+  {
+    category: "Activity",
+    metrics: [
+      "Commits (Last Year)",
+      "Pull Requests (Last Year)",
+      "Issues (Last Year)",
+    ],
+  },
+  {
+    category: "Languages",
+    metrics: ["Primary Language", "Secondary Languages"],
+  },
+  {
+    category: "Collaboration",
+    metrics: [
+      "Open Source Contributions",
+      "Team Projects",
+      "Code Review Thoroughness",
+    ],
+  },
+];
+
+const formatDate = (isoString: string) => {
+  const date = new Date(isoString);
+  return date.toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
+};
+
+export function CompareTable({ candidates }: CompareTableProps) {
   return (
     <Table>
       <TableHeader>
         <TableRow>
-          <TableHead className="w-[200px]">Metric</TableHead>
-          <TableHead>John Doe</TableHead>
-          <TableHead>Jane Doe</TableHead>
+          <TableHead></TableHead>
+          {candidates.map((candidate) => (
+            <TableHead key={candidate.username} className="text-center">
+              <div className="flex flex-col items-center">
+                <img
+                  src={candidate.avatar}
+                  alt={candidate.name}
+                  className="w-10 h-10 rounded-full mb-1"
+                />
+                <p className="font-medium">{candidate.name}</p>
+                <p className="text-sm text-gray-500">@{candidate.username}</p>
+              </div>
+            </TableHead>
+          ))}
         </TableRow>
       </TableHeader>
       <TableBody>
-        {metrics.map((category) => (
-          <React.Fragment key={category.category}>
+        {categories.map((section) => (
+          <React.Fragment key={section.category}>
             <TableRow>
-              <TableCell colSpan={3} className="bg-muted font-medium">
-                {category.category}
+              <TableCell colSpan={candidates.length + 1} className=" font-semibold text-lg py-2">
+                {section.category}
               </TableCell>
             </TableRow>
-            {category.metrics.map((metric) => (
-              <TableRow key={metric.name}>
-                <TableCell className="font-medium">{metric.name}</TableCell>
-                <TableCell>
-                  {getBadgeVariant(metric.johnDoe) ? (
-                    <Badge variant={getBadgeVariant(metric.johnDoe)}>{metric.johnDoe}</Badge>
-                  ) : (
-                    metric.johnDoe
-                  )}
-                </TableCell>
-                <TableCell>
-                  {getBadgeVariant(metric.janeDoe) ? (
-                    <Badge variant={getBadgeVariant(metric.janeDoe)}>{metric.janeDoe}</Badge>
-                  ) : (
-                    metric.janeDoe
-                  )}
-                </TableCell>
+            {section.metrics.map((metric) => (
+              <TableRow key={metric}>
+                <TableCell>{metric}</TableCell>
+                {candidates.map((candidate) => (
+                  <TableCell key={candidate.username} className="text-center">
+                    {
+                      metric === "Match Score"
+                        ? candidate.matchScore
+                        : metric === "GitHub Member Since"
+                        ? formatDate(candidate.joinedGithub)
+                        : metric === "Repositories"
+                        ? candidate.totalRepos
+                        : metric === "Commits (Last Year)"
+                        ? candidate.totalCommits
+                        : metric === "Pull Requests (Last Year)"
+                        ? candidate.totalPRs
+                        : metric === "Issues (Last Year)"
+                        ? candidate.totalIssues
+                        : metric === "Code Review Thoroughness"
+                        ? candidate.codeReviewThoroughness
+                        : metric === "Primary Language"
+                        ? candidate.topLanguages[0]
+                        : metric === "Secondary Languages"
+                        ? candidate.topLanguages.slice(1).join(", ")
+                        : metric === "Open Source Contributions"
+                        ? candidate.openSourceContributed
+                        : metric === "Team Projects"
+                        ? candidate.teamProjects
+                        : metric === "Average PR Size"
+                        ? candidate.avgPRSize
+                        : "N/A"
+                    }
+                  </TableCell>
+                ))}
               </TableRow>
             ))}
           </React.Fragment>
         ))}
       </TableBody>
     </Table>
-  )
+  );
 }
-

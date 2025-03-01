@@ -21,6 +21,8 @@ const candidateSchema = new mongoose.Schema(
     totalRepos:{ type: Number, default: 0 },
     codeReviewThoroughness:{type: String, enum: ["low", "medium", "high"] ,default: "medium"},
     // teamProjects : {type:Number},
+    companyIds: [{ type: mongoose.Schema.Types.ObjectId, ref: "Company" }], // Companies that have access to this candidate
+
     createdAt: { type: Date, default: Date.now },
     updatedAt: { type: Date, default: Date.now },
   },

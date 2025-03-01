@@ -1,3 +1,7 @@
+"use client"
+
+import { useParams } from "next/navigation"
+import { useEffect, useState } from "react"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -11,31 +15,39 @@ import { ActivityTimeline } from "@/components/activity-timeline"
 import { ArrowLeftIcon, GitCompareIcon, UserCheckIcon } from "lucide-react"
 import Link from "next/link"
 
-export default function CandidateProfile({ params }: { params: { username: string } }) {
-  const { username } = params
+export default function CandidateProfile() {
+  const username="karthik-k44" // Get dynamic username from URL
+  const [candidate, setCandidate] = useState<any>(null)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
 
-  // This would be fetched from an API in a real application
-  const candidate = {
-    username,
-    name: "John Doe",
-    avatar: "/placeholder.svg?height=100&width=100",
-    bio: "Full-stack developer with 5+ years of experience. Passionate about open source and building scalable applications.",
-    matchScore: 87,
-    status: "Pending",
-    location: "San Francisco, CA",
-    joinedGithub: "2018-05-12",
-    topLanguages: ["TypeScript", "JavaScript", "Python"],
-    strengths: [
-      "Strong TypeScript skills",
-      "Regular commit activity",
-      "Active in open source",
-      "Thorough code reviews",
-    ],
-    weaknesses: ["Limited backend experience", "Few contributions to large projects"],
-  }
+  useEffect(() => {
+    if (!username) return // Avoid running fetch if username is missing
+
+    const fetchCandidate = async () => {
+      try {
+        const response = await fetch(`http://localhost:5000/api/candidates/${username}`)
+        if (!response.ok) throw new Error("Failed to fetch candidate data")
+        const data = await response.json()
+      console.log(data)
+        setCandidate(data)
+      } catch (err: any) {
+        setError(err.message)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchCandidate()
+  }, [username]) // Dependency: username
+
+  if (loading) return <div className="flex justify-center items-center h-40 text-lg">Loading candidate data...</div>
+  if (error) return <div className="text-red-500 text-center text-lg">Error: {error}</div>
+  if (!candidate) return <div className="text-center text-lg">No candidate found</div>
 
   return (
     <div className="space-y-6">
+      {/* Header Section */}
       <div className="flex items-center gap-2">
         <Button variant="outline" size="icon" asChild>
           <Link href="/candidates">
@@ -47,12 +59,13 @@ export default function CandidateProfile({ params }: { params: { username: strin
       </div>
 
       <div className="grid gap-6 md:grid-cols-3">
+        {/* Candidate Profile Card */}
         <Card className="md:col-span-1">
           <CardHeader>
             <div className="flex flex-col items-center text-center">
               <Avatar className="h-24 w-24">
-                <AvatarImage src={candidate.avatar} alt={candidate.name} />
-                <AvatarFallback>{candidate.name.substring(0, 2)}</AvatarFallback>
+                <AvatarImage src={candidate.avatar || "/placeholder.svg?height=100&width=100"} alt={candidate.name} />
+                <AvatarFallback>{candidate.name?.substring(0, 2).toUpperCase() || "NA"}</AvatarFallback>
               </Avatar>
               <CardTitle className="mt-4">{candidate.name}</CardTitle>
               <CardDescription className="text-sm">
@@ -69,32 +82,38 @@ export default function CandidateProfile({ params }: { params: { username: strin
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="text-center">
-              <MatchScore score={candidate.matchScore} />
+              <MatchScore score={candidate.matchScore || 0} />
             </div>
 
             <div className="space-y-2">
               <div className="text-sm text-muted-foreground">Bio</div>
-              <p className="text-sm">{candidate.bio}</p>
+              <p className="text-sm">{candidate.bio || "No bio available"}</p>
             </div>
 
             <div className="space-y-2">
               <div className="text-sm text-muted-foreground">Location</div>
-              <p className="text-sm">{candidate.location}</p>
+              <p className="text-sm">{candidate.location || "Location not provided"}</p>
             </div>
 
             <div className="space-y-2">
               <div className="text-sm text-muted-foreground">GitHub Member Since</div>
-              <p className="text-sm">{new Date(candidate.joinedGithub).toLocaleDateString()}</p>
+              <p className="text-sm">
+                {candidate.joinedGithub ? new Date(candidate.joinedGithub).toLocaleDateString() : "N/A"}
+              </p>
             </div>
 
             <div className="space-y-2">
               <div className="text-sm text-muted-foreground">Top Languages</div>
               <div className="flex flex-wrap gap-2">
-                {candidate.topLanguages.map((language) => (
-                  <Badge key={language} variant="outline">
-                    {language}
-                  </Badge>
-                ))}
+                {candidate.topLanguages?.length ? (
+                  candidate.topLanguages.map((language: string) => (
+                    <Badge key={language} variant="outline">
+                      {language}
+                    </Badge>
+                  ))
+                ) : (
+                  <p className="text-sm text-muted-foreground">No data available</p>
+                )}
               </div>
             </div>
 
@@ -113,6 +132,7 @@ export default function CandidateProfile({ params }: { params: { username: strin
           </CardContent>
         </Card>
 
+        {/* Tabs Section */}
         <Card className="md:col-span-2">
           <CardHeader>
             <Tabs defaultValue="overview">
@@ -122,14 +142,14 @@ export default function CandidateProfile({ params }: { params: { username: strin
                 <TabsTrigger value="activity">Activity</TabsTrigger>
               </TabsList>
               <TabsContent value="overview" className="space-y-6 mt-4">
-                <StrengthsWeaknesses strengths={candidate.strengths} weaknesses={candidate.weaknesses} />
-                <LanguageChart />
+                <StrengthsWeaknesses strengths={candidate.strengths || []} weaknesses={candidate.weaknesses || []} />
+                <LanguageChart username={username} />
               </TabsContent>
               <TabsContent value="contributions" className="mt-4">
-                <ContributionChart />
+                  <ContributionChart username={username} />
               </TabsContent>
               <TabsContent value="activity" className="mt-4">
-                <ActivityTimeline username={candidate.username} />
+                <ActivityTimeline username={username} />
               </TabsContent>
             </Tabs>
           </CardHeader>
@@ -138,4 +158,3 @@ export default function CandidateProfile({ params }: { params: { username: strin
     </div>
   )
 }
-

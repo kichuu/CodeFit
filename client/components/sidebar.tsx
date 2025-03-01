@@ -1,7 +1,7 @@
 "use client"
 
 import Link from "next/link"
-import { usePathname } from "next/navigation"
+import { usePathname, useRouter } from "next/navigation"
 import {
   GitlabIcon as GitHubIcon,
   HomeIcon,
@@ -9,17 +9,19 @@ import {
   ListFilterIcon,
   UserCheckIcon,
   UserPlusIcon,
+  LogOutIcon,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { ThemeToggle } from "@/components/theme-toggle"
 
 export function Sidebar() {
   const pathname = usePathname()
+  const router = useRouter()
 
   const routes = [
     {
       name: "Dashboard",
-      path: "/",
+      path: "/dashboard",
       icon: HomeIcon,
     },
     {
@@ -49,6 +51,11 @@ export function Sidebar() {
     },
   ]
 
+  const handleLogout = () => {
+    localStorage.clear()
+    router.push("/")
+  }
+
   return (
     <div className="flex h-screen w-16 flex-col justify-between border-r bg-background p-3 md:w-64">
       <div className="space-y-4">
@@ -75,10 +82,16 @@ export function Sidebar() {
         </nav>
       </div>
       <div className="flex flex-col items-center gap-2 md:items-start">
+        <button
+          onClick={handleLogout}
+          className="flex h-10 w-full items-center justify-center rounded-md px-3 text-muted-foreground transition-colors hover:bg-red-500 hover:text-white md:justify-start"
+        >
+          <LogOutIcon className="h-5 w-5" />
+          <span className="hidden md:ml-3 md:inline-block">Logout</span>
+        </button>
         <ThemeToggle />
         <div className="hidden md:block text-xs text-muted-foreground">© 2025 GitHub Recruiter</div>
       </div>
     </div>
   )
 }
-

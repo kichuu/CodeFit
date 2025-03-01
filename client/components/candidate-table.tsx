@@ -1,5 +1,6 @@
 "use client"
 
+import { useEffect, useState } from "react"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -7,62 +8,54 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { MoreHorizontalIcon } from "lucide-react"
 import Link from "next/link"
 
+interface Candidate {
+  _id: string
+  username: string
+  name: string
+  avatar: string
+  topLanguages: string[]
+  status: string
+}
+
 interface CandidateTableProps {
   limit?: number
 }
 
 export function CandidateTable({ limit }: CandidateTableProps) {
-  // This would be fetched from an API in a real application
-  const candidates = [
-    {
-      username: "johndoe",
-      name: "John Doe",
-      avatar: "/placeholder.svg?height=40&width=40",
-      matchScore: 87,
-      skills: ["TypeScript", "React", "Node.js"],
-      status: "Pending",
-    },
-    {
-      username: "janedoe",
-      name: "Jane Doe",
-      avatar: "/placeholder.svg?height=40&width=40",
-      matchScore: 92,
-      skills: ["Python", "Django", "AWS"],
-      status: "Hired",
-    },
-    {
-      username: "bobsmith",
-      name: "Bob Smith",
-      avatar: "/placeholder.svg?height=40&width=40",
-      matchScore: 78,
-      skills: ["JavaScript", "Vue", "Express"],
-      status: "Pending",
-    },
-    {
-      username: "alicejones",
-      name: "Alice Jones",
-      avatar: "/placeholder.svg?height=40&width=40",
-      matchScore: 85,
-      skills: ["Java", "Spring", "Kubernetes"],
-      status: "Pending",
-    },
-    {
-      username: "mikebrown",
-      name: "Mike Brown",
-      avatar: "/placeholder.svg?height=40&width=40",
-      matchScore: 81,
-      skills: ["Go", "Docker", "PostgreSQL"],
-      status: "Hired",
-    },
-    {
-      username: "sarahlee",
-      name: "Sarah Lee",
-      avatar: "/placeholder.svg?height=40&width=40",
-      matchScore: 90,
-      skills: ["Rust", "WebAssembly", "GraphQL"],
-      status: "Pending",
-    },
-  ]
+  const [candidates, setCandidates] = useState<Candidate[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+
+  useEffect(() => {
+    async function fetchCandidates() {
+      try {
+        const token = localStorage.getItem("token") // Get token from localStorage
+        if (!token) throw new Error("No token found, please log in.")
+          console.log(token)
+        const res = await fetch("http://localhost:5000/api/candidates/", {
+          method: "GET",
+          headers: {
+            "Authorization": `Bearer ${token}`, // Attach token in Authorization header
+            "Content-Type": "application/json",
+          },
+        })
+
+        if (!res.ok) throw new Error("Failed to fetch candidates")
+        const data: Candidate[] = await res.json()
+      console.log(data)
+        setCandidates(data)
+      } catch (err: any) {
+        setError(err.message)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchCandidates()
+  }, [])
+
+  if (loading) return <p>Loading candidates...</p>
+  if (error) return <p className="text-red-500">Error: {error}</p>
 
   const displayCandidates = limit ? candidates.slice(0, limit) : candidates
 
@@ -79,7 +72,7 @@ export function CandidateTable({ limit }: CandidateTableProps) {
       </TableHeader>
       <TableBody>
         {displayCandidates.map((candidate) => (
-          <TableRow key={candidate.username}>
+          <TableRow key={candidate._id}>
             <TableCell>
               <Link href={`/candidates/${candidate.username}`} className="flex items-center gap-3 hover:underline">
                 <Avatar className="h-8 w-8">
@@ -94,26 +87,17 @@ export function CandidateTable({ limit }: CandidateTableProps) {
             </TableCell>
             <TableCell>
               <div className="flex items-center">
-                <span
-                  className={`mr-2 h-2 w-2 rounded-full ${
-                    candidate.matchScore >= 90
-                      ? "bg-green-500"
-                      : candidate.matchScore >= 80
-                        ? "bg-yellow-500"
-                        : "bg-red-500"
-                  }`}
-                ></span>
-                <span>{candidate.matchScore}%</span>
+                <span className="mr-2 h-2 w-2 rounded-full bg-gray-400"></span>
+                <span>0%</span>
               </div>
             </TableCell>
             <TableCell className="hidden md:table-cell">
               <div className="flex flex-wrap gap-1">
-                {candidate.skills.slice(0, 2).map((skill) => (
+                {candidate.topLanguages.slice(0, 2).map((skill) => (
                   <Badge key={skill} variant="outline">
                     {skill}
                   </Badge>
                 ))}
-                {candidate.skills.length > 2 && <Badge variant="outline">+{candidate.skills.length - 2}</Badge>}
               </div>
             </TableCell>
             <TableCell>
@@ -130,4 +114,3 @@ export function CandidateTable({ limit }: CandidateTableProps) {
     </Table>
   )
 }
-

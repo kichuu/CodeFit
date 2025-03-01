@@ -8,6 +8,7 @@ dotenv.config();
 
 import axios from "axios";
 import { Company } from "../models/Company";
+import { Benchmark } from "../models/Benchmark";
 
 const GITHUB_TOKEN = process.env.GITHUB_TOKEN; // Replace with your token
 
@@ -206,7 +207,6 @@ export async function fetchGitHubData(username: string): Promise<GitHubData | nu
 
         // Check if candidate already exists
         let candidate = await Candidate.findOne({ username });
-
         if (candidate) {
             // If companyId is not in the array, add it
             if (!candidate.companyIds.includes(companyId)) {
@@ -223,6 +223,17 @@ export async function fetchGitHubData(username: string): Promise<GitHubData | nu
             res.status(500).json({ message: "Failed to fetch GitHub data" });
             return;
         }
+
+        // Find the company's benchmark
+        const benchmark = await Benchmark.findOne({companyIds: companyId });
+        console.log(benchmark)
+        if (!benchmark) {
+            res.status(404).json({ message: "Benchmark not found for company" });
+            return;
+        }
+
+        // Calculate match percentage
+        const matchPercent = calculateMatchPercent(gitHubData, benchmark);
 
         // Save GitHub data in the database
         const newCandidate = new Candidate({
@@ -242,6 +253,7 @@ export async function fetchGitHubData(username: string): Promise<GitHubData | nu
             teamProjects: gitHubData.teamProjects,
             codeReviewThoroughness: gitHubData.codeReviewThoroughness,
             companyIds: [companyId],
+            matchPercent:matchPercent, // Assign calculated match percent
         });
 
         await newCandidate.save();
@@ -250,6 +262,33 @@ export async function fetchGitHubData(username: string): Promise<GitHubData | nu
         res.status(500).json({ message: (error as Error).message });
     }
 };
+
+// Function to calculate match percentage
+const calculateMatchPercent = (gitHubData: any, benchmark: any): number => {
+    const weightCommits = 0.6;
+    const weightPRs = 0.2;
+    const weightIssues = 0.2;
+
+    const commitScore = gitHubData.totalCommits >= benchmark.totalCommits 
+        ? 100 
+        : (gitHubData.totalCommits / benchmark.totalCommits) * 100;
+
+    const prScore = gitHubData.totalPRs >= benchmark.totalPRs 
+        ? 100 
+        : (gitHubData.totalPRs / benchmark.totalPRs) * 100;
+
+    const issueScore = gitHubData.totalIssues >= benchmark.totalIssues 
+        ? 100 
+        : (gitHubData.totalIssues / benchmark.totalIssues) * 100;
+
+    const matchPercent = 
+        (commitScore * weightCommits) +
+        (prScore * weightPRs) +
+        (issueScore * weightIssues);
+
+    return Math.round(matchPercent);
+};
+
 
   
 

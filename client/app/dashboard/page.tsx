@@ -1,13 +1,13 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { CandidateSearch } from "@/components/candidate-search"
-import { CandidateTable } from "@/components/candidate-table"
-import { DashboardStats } from "@/components/dashboard-stats"
-import { RecentActivity } from "@/components/recent-activity"
-import { SetBenchmarkForm } from "@/components/set-benchmark-form"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { CandidateSearch } from "@/components/candidate-search";
+import { CandidateTable } from "@/components/candidate-table";
+import { DashboardStats } from "@/components/dashboard-stats";
+import { RecentActivity } from "@/components/recent-activity";
+import { SetBenchmarkForm } from "@/components/set-benchmark-form";
 
 export default function Dashboard() {
   return (
-    <div className="space-y-6">
+    <div className="p-6 md:ml-64 space-y-6">
       <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
@@ -50,5 +50,5 @@ export default function Dashboard() {
         </Card>
       </div>
     </div>
-  )
+  );
 }

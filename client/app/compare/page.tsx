@@ -1,10 +1,22 @@
+"use client"
+import { useState } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { CompareChart } from "@/components/compare-chart"
 import { CompareSelector } from "@/components/compare-selector"
 import { CompareTable } from "@/components/compare-table"
 import { CompareRecommendation } from "@/components/compare-recommendation"
+import {Candidate} from "./types"
+
+
 
 export default function ComparePage() {
+  const [selectedCandidates, setSelectedCandidates] = useState<Candidate[]>([])
+
+  // Function to update selected candidates from CompareSelector
+  const handleCompare = (candidates: Candidate[]): void => {
+    setSelectedCandidates(candidates)
+  }
+
   return (
     <div className="space-y-6">
       <div>
@@ -12,7 +24,8 @@ export default function ComparePage() {
         <p className="text-muted-foreground">Side-by-side comparison of GitHub candidates</p>
       </div>
 
-      <CompareSelector />
+      {/* Pass handleCompare function to CompareSelector */}
+      <CompareSelector onCompare={handleCompare} />
 
       <div className="grid gap-6">
         <Card>
@@ -21,7 +34,7 @@ export default function ComparePage() {
             <CardDescription>Comparison of programming languages and technical skills</CardDescription>
           </CardHeader>
           <CardContent>
-            <CompareChart type="skills" />
+            <CompareChart candidates={selectedCandidates} type="skills" />
           </CardContent>
         </Card>
 
@@ -31,7 +44,7 @@ export default function ComparePage() {
             <CardDescription>Comparison of GitHub activity metrics</CardDescription>
           </CardHeader>
           <CardContent>
-            <CompareChart type="activity" />
+            <CompareChart candidates={selectedCandidates} type="activity" />
           </CardContent>
         </Card>
 
@@ -41,7 +54,8 @@ export default function ComparePage() {
             <CardDescription>Side-by-side comparison of all metrics</CardDescription>
           </CardHeader>
           <CardContent>
-            <CompareTable />
+            {/* Pass selectedCandidates to CompareTable */}
+            <CompareTable candidates={selectedCandidates} />
           </CardContent>
         </Card>
 
@@ -58,4 +72,3 @@ export default function ComparePage() {
     </div>
   )
 }
-

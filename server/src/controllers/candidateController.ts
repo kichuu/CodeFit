@@ -28,6 +28,9 @@ interface GitHubData {
   totalIssues: number;
   commitQualityScore: number;
   openSourceContributed:String;
+  totalRepos:Number;
+  teamProjects: number;
+  codeReviewThoroughness: String;
 }
 
 // Function to calculate commit message quality score
@@ -77,7 +80,6 @@ function calculateCommitQuality(commitMessages: string[]): number {
 
 export async function fetchGitHubData(username: string): Promise<GitHubData | null> {
     try {
-      // Fetch user profile details
       const userResponse = await axios.get(`https://api.github.com/users/${username}`, { headers });
       const user = userResponse.data;
   
@@ -92,69 +94,87 @@ export async function fetchGitHubData(username: string): Promise<GitHubData | nu
         totalPRs: 0,
         totalIssues: 0,
         commitQualityScore: 0,
+        codeReviewThoroughness: "Low", // ✅ Initialize
         topLanguages: [],
-        openSourceContributed: "No", // Default to "No"
+        openSourceContributed: "No",
+        totalRepos: 0, 
+        teamProjects: 0, 
       };
   
       // Fetch repositories
       const reposResponse = await axios.get(`https://api.github.com/users/${username}/repos?per_page=100`, { headers });
-      const repos = reposResponse.data.map((repo: { name: string }) => repo.name);
-      
+      const repos = reposResponse.data;
+  
       let allCommitMessages: string[] = [];
       let languageCount: Record<string, number> = {};
   
+      userData.totalRepos = repos.length;
+  
       for (const repo of repos) {
+        const repoName: string = repo.name;
+  
+        
+  
         try {
-          // Fetch commit history
-          const commitsResponse = await axios.get(`https://api.github.com/repos/${username}/${repo}/commits?per_page=100`, { headers });
+          const commitsResponse = await axios.get(
+            `https://api.github.com/repos/${username}/${repoName}/commits?per_page=100`,
+            { headers }
+          );
           const commits = commitsResponse.data;
   
           allCommitMessages.push(...commits.map((commit: { commit: { message: string } }) => commit.commit.message));
           userData.totalCommits += commits.length;
         } catch (error: any) {
-          if (error.response?.status === 409) console.log(`⚠ Skipping empty repo: ${repo}`);
+          if (error.response?.status === 409) console.log(`⚠ Skipping empty repo: ${repoName}`);
         }
   
-        // Fetch repository languages
         try {
-          const languagesResponse = await axios.get(`https://api.github.com/repos/${username}/${repo}/languages`, { headers });
+          const languagesResponse = await axios.get(
+            `https://api.github.com/repos/${username}/${repoName}/languages`,
+            { headers }
+          );
           for (const [lang, bytes] of Object.entries(languagesResponse.data)) {
             languageCount[lang] = (languageCount[lang] || 0) + (bytes as number);
           }
         } catch (error) {}
       }
   
-      // Determine top languages
       userData.topLanguages = Object.entries(languageCount)
         .sort((a, b) => b[1] - a[1])
         .map(([lang]) => lang)
         .slice(0, 5);
   
-      // Fetch total PRs
       try {
         const prsResponse = await axios.get(`https://api.github.com/search/issues?q=author:${username}+type:pr`, { headers });
         userData.totalPRs = prsResponse.data.total_count;
       } catch (error) {}
   
-      // Fetch total Issues (excluding PRs)
       try {
         const issuesResponse = await axios.get(`https://api.github.com/search/issues?q=author:${username}+type:issue`, { headers });
         userData.totalIssues = issuesResponse.data.total_count;
       } catch (error) {}
   
-      // Detect Open Source Contribution (PRs to external repos)
       try {
         const externalPRsResponse = await axios.get(
           `https://api.github.com/search/issues?q=author:${username}+type:pr -repo:${username}`,
           { headers }
         );
         if (externalPRsResponse.data.total_count > 0) {
-          userData.openSourceContributed = "Yes"; // If PRs exist outside their own repos
+          userData.openSourceContributed = "Yes";
         }
       } catch (error) {}
   
-      // Calculate commit quality score
+      // ✅ Calculate commit quality score
       userData.commitQualityScore = calculateCommitQuality(allCommitMessages);
+  
+      // ✅ Assign "Code Review Thoroughness" based on commit quality score
+      if (userData.commitQualityScore >= 7) {
+        userData.codeReviewThoroughness = "high";
+      } else if (userData.commitQualityScore >= 5) {
+        userData.codeReviewThoroughness = "medium";
+      } else {
+        userData.codeReviewThoroughness = "low";
+      }
   
       console.log("📊 GitHub Data:", JSON.stringify(userData, null, 2));
       return userData;
@@ -164,6 +184,10 @@ export async function fetchGitHubData(username: string): Promise<GitHubData | nu
     }
   }
   
+  
+  
+  
+
 
 
 
@@ -197,7 +221,10 @@ export const addCandidate = async (req: Request, res: Response): Promise<void> =
         totalPRs: gitHubData.totalPRs,
         totalIssues: gitHubData.totalIssues,
         commitQualityScore: gitHubData.commitQualityScore,
-        openSourceContributed: gitHubData.openSourceContributed, // ✅ Added this field
+        openSourceContributed: gitHubData.openSourceContributed,
+        totalRepos: gitHubData.totalRepos,
+        teamProjects:gitHubData.teamProjects,
+        codeReviewThoroughness:gitHubData.codeReviewThoroughness,
       });
   
       await newCandidate.save();

@@ -1,11 +1,13 @@
 import { Request, Response } from "express";
 import { fetchGitHubProfile, fetchTopLanguages } from "../utils/githubAPI";
 import { Candidate } from "../models/Candidate";
+
 import dotenv from "dotenv";
 
 dotenv.config();
 
 import axios from "axios";
+import { Company } from "../models/Company";
 
 const GITHUB_TOKEN = process.env.GITHUB_TOKEN; // Replace with your token
 
@@ -195,6 +197,8 @@ export const addCandidate = async (req: Request, res: Response): Promise<void> =
     try {
       const { githubUrl } = req.body;
       const username = githubUrl.split("/").pop();
+      const companyId = req.body.companyId; // Extracted from JWT middleware
+
   
       if (!username) {
         res.status(400).json({ message: "Invalid GitHub URL" });
@@ -225,6 +229,8 @@ export const addCandidate = async (req: Request, res: Response): Promise<void> =
         totalRepos: gitHubData.totalRepos,
         teamProjects:gitHubData.teamProjects,
         codeReviewThoroughness:gitHubData.codeReviewThoroughness,
+        companyIds: [companyId],
+
       });
   
       await newCandidate.save();
@@ -236,7 +242,7 @@ export const addCandidate = async (req: Request, res: Response): Promise<void> =
   
   
 
-export const getCandidates = async (req: Request, res: Response)  => {
+export const getCandidates = async (req: Request, res: Response): Promise<void>  => {
   try {
     const candidates = await Candidate.find();
     res.status(200).json(candidates);
@@ -244,6 +250,25 @@ export const getCandidates = async (req: Request, res: Response)  => {
     res.status(500).json({ message: (error as Error).message });
   }
 };
+
+
+
+export const getCandidatesForCompany = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const companyId = req.body.companyId; // Extracted from JWT middleware
+
+    const company = await Company.findById(companyId);
+    if (!company)  {res.status(404).json({ message: "Company not found" })
+        return
+}
+    const candidates = await Candidate.find({ companyIds: companyId });
+
+    res.json(candidates);
+  } catch (error) {
+    res.status(500).json({ message: "Server error", error });
+  }
+};
+
 
 export const getCandidate = async (req: Request, res: Response) : Promise<void> => {
   try {

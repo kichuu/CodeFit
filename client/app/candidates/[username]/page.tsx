@@ -16,7 +16,8 @@ import { ArrowLeftIcon, GitCompareIcon, UserCheckIcon } from "lucide-react"
 import Link from "next/link"
 
 export default function CandidateProfile() {
-  const username="karthik-k44" // Get dynamic username from URL
+  const { username } = useParams<{ username: string }>()
+  console.log(username) // Get dynamic username from URL
   const [candidate, setCandidate] = useState<any>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)

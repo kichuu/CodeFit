@@ -45,33 +45,27 @@ export function LanguageChart({ username }: LanguageChartProps) {
 
         // Convert raw byte counts into percentages
         const totalBytes = Object.values(languageStats).reduce((sum, bytes) => sum + bytes, 0);
-        let chartData = Object.entries(languageStats)
+        const sortedLanguages = Object.entries(languageStats)
           .map(([name, bytes]) => ({
             name,
             value: parseFloat(((bytes / totalBytes) * 100).toFixed(2)), // Convert to percentage
             color: getColorForLanguage(name),
           }))
+          .filter(lang => lang.value >= 1) // **Exclude languages with less than 1% usage**
           .sort((a, b) => b.value - a.value); // Sort by usage percentage
-        
-        // Keep the top 5 languages and group the rest as "Others"
-        if (chartData.length > 5) {
-          const topFive = chartData.slice(0, 5);
-          const otherLanguages = chartData.slice(5);
-        
-          const othersValue = otherLanguages.reduce((sum, lang) => sum + lang.value, 0);
-          if (othersValue > 0) {
-            topFive.push({
-              name: "Others",
-              value: parseFloat(othersValue.toFixed(2)),
-              color: "#6c757d", // Gray color for "Others"
-            });
+
+        // Get the top 4 languages, and group the rest under "Others"
+        const topLanguages = sortedLanguages.slice(0, 4);
+        const otherLanguages = sortedLanguages.slice(4);
+
+        if (otherLanguages.length > 0) {
+          const otherTotal = otherLanguages.reduce((sum, lang) => sum + lang.value, 0);
+          if (otherTotal >= 1) { // Only add "Others" if it contributes at least 1%
+            topLanguages.push({ name: "Others", value: parseFloat(otherTotal.toFixed(2)), color: "#6c757d" });
           }
-        
-          chartData = topFive;
         }
-        
-        setLanguageData(chartData);
-        
+
+        setLanguageData(topLanguages);
       } catch (err: any) {
         setError(err.message);
       } finally {
@@ -139,5 +133,5 @@ function getColorForLanguage(language: string) {
     Go: "#00ADD8",
     Rust: "#dea584",
   };
-  return colors[language] || "#6c757d"; // Default gray color
+  return colors[language] || "#6c757d"; // Default gray color for unknown languages
 }

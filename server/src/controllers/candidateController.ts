@@ -193,76 +193,95 @@ export async function fetchGitHubData(username: string): Promise<GitHubData | nu
 
 
 
-export const addCandidate = async (req: Request, res: Response): Promise<void> => {
+  export const addCandidate = async (req: Request, res: Response): Promise<void> => {
     try {
-      const { githubUrl } = req.body;
-      const username = githubUrl.split("/").pop();
-      const companyId = req.body.companyId; // Extracted from JWT middleware
+        const { githubUrl } = req.body;
+        const username = githubUrl.split("/").pop();
+        const companyId = req.body.companyId; // Extracted from JWT middleware
+
+        if (!username) {
+            res.status(400).json({ message: "Invalid GitHub URL" });
+            return;
+        }
+
+        // Check if candidate already exists
+        let candidate = await Candidate.findOne({ username });
+
+        if (candidate) {
+            // If companyId is not in the array, add it
+            if (!candidate.companyIds.includes(companyId)) {
+                candidate.companyIds.push(companyId);
+                await candidate.save();
+            }
+            res.status(200).json(candidate);
+            return;
+        }
+
+        // Fetch GitHub profile and repository data
+        const gitHubData = await fetchGitHubData(username);
+        if (!gitHubData) {
+            res.status(500).json({ message: "Failed to fetch GitHub data" });
+            return;
+        }
+
+        // Save GitHub data in the database
+        const newCandidate = new Candidate({
+            username,
+            name: gitHubData.name,
+            avatar: gitHubData.avatar,
+            bio: gitHubData.bio,
+            location: gitHubData.location,
+            joinedGithub: gitHubData.joinedGithub,
+            topLanguages: gitHubData.topLanguages,
+            totalCommits: gitHubData.totalCommits,
+            totalPRs: gitHubData.totalPRs,
+            totalIssues: gitHubData.totalIssues,
+            commitQualityScore: gitHubData.commitQualityScore,
+            openSourceContributed: gitHubData.openSourceContributed,
+            totalRepos: gitHubData.totalRepos,
+            teamProjects: gitHubData.teamProjects,
+            codeReviewThoroughness: gitHubData.codeReviewThoroughness,
+            companyIds: [companyId],
+        });
+
+        await newCandidate.save();
+        res.status(201).json(newCandidate);
+    } catch (error) {
+        res.status(500).json({ message: (error as Error).message });
+    }
+};
 
   
-      if (!username) {
-        res.status(400).json({ message: "Invalid GitHub URL" });
-        return;
-      }
-  
-      // Fetch GitHub profile and repository data
-      const gitHubData = await fetchGitHubData(username);
-      if (!gitHubData) {
-        res.status(500).json({ message: "Failed to fetch GitHub data" });
-        return;
-      }
-  
-      // Save GitHub data in the database
-      const newCandidate = new Candidate({
-        username,
-        name: gitHubData.name,
-        avatar: gitHubData.avatar,
-        bio: gitHubData.bio,
-        location: gitHubData.location,
-        joinedGithub: gitHubData.joinedGithub,
-        topLanguages: gitHubData.topLanguages,
-        totalCommits: gitHubData.totalCommits,
-        totalPRs: gitHubData.totalPRs,
-        totalIssues: gitHubData.totalIssues,
-        commitQualityScore: gitHubData.commitQualityScore,
-        openSourceContributed: gitHubData.openSourceContributed,
-        totalRepos: gitHubData.totalRepos,
-        teamProjects:gitHubData.teamProjects,
-        codeReviewThoroughness:gitHubData.codeReviewThoroughness,
-        companyIds: [companyId],
 
-      });
   
-      await newCandidate.save();
-      res.status(201).json(newCandidate);
+  export const getCandidates = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const  companyId  = req.body.companyId;
+        console.log(companyId)
+      
+  
+        const candidates = await Candidate.find();
+       
+        
+      res.status(200).json(candidates);
     } catch (error) {
       res.status(500).json({ message: (error as Error).message });
     }
   };
   
-  
-
-export const getCandidates = async (req: Request, res: Response): Promise<void>  => {
-  try {
-    const candidates = await Candidate.find();
-    res.status(200).json(candidates);
-  } catch (error) {
-    res.status(500).json({ message: (error as Error).message });
-  }
-};
-
 
 
 export const getCandidatesForCompany = async (req: Request, res: Response): Promise<void> => {
   try {
     const companyId = req.body.companyId; // Extracted from JWT middleware
-
+    
     const company = await Company.findById(companyId);
+    console.log(company)
     if (!company)  {res.status(404).json({ message: "Company not found" })
         return
 }
     const candidates = await Candidate.find({ companyIds: companyId });
-
+    console.log(candidates)
     res.json(candidates);
   } catch (error) {
     res.status(500).json({ message: "Server error", error });

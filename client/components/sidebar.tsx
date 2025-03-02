@@ -62,9 +62,9 @@ export function Sidebar() {
       <div className="fixed top-0 left-0 h-screen w-16 flex flex-col justify-between border-r bg-background p-3 md:w-64">
         <div className="space-y-4">
           <div className="flex h-16 items-center justify-center md:justify-start">
-            <Link href="/" className="flex items-center gap-2">
+            <Link href="/dashboard" className="flex items-center gap-2">
               <GitHubIcon className="h-8 w-8" />
-              <span className="hidden text-xl font-bold md:inline-block">GitHub Recruiter</span>
+              <span className="hidden text-xl font-bold md:inline-block">CodeFit</span>
             </Link>
           </div>
           <nav className="space-y-2">
@@ -92,7 +92,7 @@ export function Sidebar() {
             <span className="hidden md:ml-3 md:inline-block">Logout</span>
           </button>
           <ThemeToggle />
-          <div className="hidden md:block text-xs text-muted-foreground">© 2025 GitHub Recruiter</div>
+          <div className="hidden md:block text-xs text-muted-foreground">© 2025 CodeFit</div>
         </div>
       </div>
 

@@ -8,7 +8,7 @@ import { AuthLayout } from "@/components/auth-layout"
 const inter = Inter({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
-  title: "GitHub Recruiter",
+  title: "CodeFit",
   description: "AI-powered GitHub recruiting and matching platform",
 }
 

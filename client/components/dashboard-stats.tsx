@@ -7,7 +7,7 @@ import { UsersIcon, UserCheckIcon, BarChart3Icon, TrendingUpIcon } from "lucide-
 const API_URL = "http://localhost:5000/api/candidates"
 
 export function DashboardStats() {
-  const [stats, setStats] = useState(null)
+  const [stats, setStats] = useState<{ totalCandidates: number; hiredCandidates: number; averageMatchScore: string; hiringRate: string } | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
 
@@ -38,10 +38,10 @@ export function DashboardStats() {
         const totalCandidates = data.length || 0
 
         // ✅ Count hired candidates where `status === "hired"`
-        const hiredCandidates = data.filter(candidate => candidate.status === "Hired").length
+        const hiredCandidates = data.filter((candidate: { status: string }) => candidate.status === "Hired").length
 
         // ✅ Calculate average match score (sum all scores and divide by total candidates)
-        const totalMatchScore = data.reduce((sum, candidate) => sum + (candidate.matchPercent || 0), 0)
+        const totalMatchScore = data.reduce((sum: any, candidate: { matchPercent: any }) => sum + (candidate.matchPercent || 0), 0)
         const averageMatchScore = totalCandidates > 0 ? (totalMatchScore / totalCandidates).toFixed(2) : "0.00"
 
         // ✅ Calculate hiring rate as a percentage

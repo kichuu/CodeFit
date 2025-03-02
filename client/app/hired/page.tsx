@@ -1,3 +1,4 @@
+"use client"
 import { CandidateSearch } from "@/components/candidate-search"
 import { HiredTable } from "@/components/hired-table"
 import { HiredFilters } from "@/components/hired-filters"
@@ -11,12 +12,10 @@ export default function HiredPage() {
           <h1 className="text-3xl font-bold tracking-tight">Hired Candidates</h1>
           <p className="text-muted-foreground">View and analyze all hired GitHub candidates</p>
         </div>
-        <CandidateSearch />
       </div>
 
       <HiredStats />
 
-      <HiredFilters />
 
       <HiredTable />
     </div>

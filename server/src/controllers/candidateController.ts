@@ -343,3 +343,45 @@ export const getCandidate = async (req: Request, res: Response) : Promise<void> 
     res.status(500).json({ message: (error as Error).message });
   }
 };
+
+
+export const deleteCandidate = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const { username } = req.params;
+      const deletedCandidate = await Candidate.findOneAndDelete({ username });
+  
+      if (!deletedCandidate) {
+        res.status(404).json({ message: "Candidate not found" });
+        return;
+      }
+  
+      res.status(200).json({ message: "Candidate deleted successfully" });
+    } catch (error) {
+      res.status(500).json({ message: (error as Error).message });
+    }
+  };
+
+
+
+
+  export const markCandidateAsHired = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const { username } = req.params;
+  
+      const updatedCandidate = await Candidate.findOneAndUpdate(
+        { username: username },
+        { $set: { status: "Hired" } },
+        { new: true }
+      );
+  
+      if (!updatedCandidate) {
+        res.status(404).json({ message: "Candidate not found" });
+        return;
+      }
+  
+      res.status(200).json({ message: "Candidate marked as Hired", candidate: updatedCandidate });
+    } catch (error) {
+      res.status(500).json({ message: (error as Error).message });
+    }
+  };
+  

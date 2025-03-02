@@ -23,6 +23,7 @@ interface Candidate {
   topLanguages: string[];
   teamProjects: number;
   avgPRSize: string;
+  matchPercent:number;
 }
 
 interface CompareTableProps {
@@ -101,7 +102,7 @@ export function CompareTable({ candidates }: CompareTableProps) {
                   <TableCell key={candidate.username} className="text-center">
                     {
                       metric === "Match Score"
-                        ? candidate.matchScore
+                        ? candidate.matchPercent
                         : metric === "GitHub Member Since"
                         ? formatDate(candidate.joinedGithub)
                         : metric === "Repositories"

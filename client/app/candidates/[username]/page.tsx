@@ -12,7 +12,7 @@ import { ContributionChart } from "@/components/contribution-chart"
 import { LanguageChart } from "@/components/language-chart"
 import { StrengthsWeaknesses } from "@/components/strengths-weaknesses"
 import { ActivityTimeline } from "@/components/activity-timeline"
-import { ArrowLeftIcon, GitCompareIcon, UserCheckIcon } from "lucide-react"
+import { ArrowLeftIcon, CheckCircleIcon, GitCompareIcon, UserCheckIcon, XCircleIcon } from "lucide-react"
 import Link from "next/link"
 
 export default function CandidateProfile() {
@@ -83,8 +83,11 @@ export default function CandidateProfile() {
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="text-center">
-              <MatchScore score={candidate.matchScore || 0} />
+              <MatchScore score={candidate.matchPercent || 0} />
             </div>
+
+            {/* Hire Suggestion Card */}
+            
 
             <div className="space-y-2">
               <div className="text-sm text-muted-foreground">Bio</div>
@@ -143,7 +146,6 @@ export default function CandidateProfile() {
                 <TabsTrigger value="activity">Activity</TabsTrigger>
               </TabsList>
               <TabsContent value="overview" className="space-y-6 mt-4">
-                <StrengthsWeaknesses strengths={candidate.strengths || []} weaknesses={candidate.weaknesses || []} />
                 <LanguageChart username={username} />
               </TabsContent>
               <TabsContent value="contributions" className="mt-4">
@@ -153,6 +155,30 @@ export default function CandidateProfile() {
                 <ActivityTimeline username={username} />
               </TabsContent>
             </Tabs>
+            {candidate.matchPercent !== undefined && (
+              <Card className={`border-2 ${candidate.matchPercent >= 65 ? 'border-green-500 bg-green-50 dark:bg-green-950/20' : 'border-red-500 bg-red-50 dark:bg-red-950/20'}`}>
+                <CardContent className="p-4">
+                  <div className="flex items-center gap-2">
+                    {candidate.matchPercent >= 65 ? (
+                      <>
+                        <CheckCircleIcon className="h-5 w-5 text-green-500" />
+                        <span className="font-medium">Recommended for hire</span>
+                      </>
+                    ) : (
+                      <>
+                        <XCircleIcon className="h-5 w-5 text-red-500" />
+                        <span className="font-medium">Not recommended for hire</span>
+                      </>
+                    )}
+                  </div>
+                  <p className="text-sm mt-2">
+                    {candidate.matchPercent >= 65
+                      ? "This candidate has a strong match with your requirements."
+                      : "This candidate may not be the best fit for your requirements."}
+                  </p>
+                </CardContent>
+              </Card>
+            )}
           </CardHeader>
         </Card>
       </div>

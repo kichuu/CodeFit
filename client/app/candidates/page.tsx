@@ -1,8 +1,13 @@
-import { CandidateSearch } from "@/components/candidate-search"
-import { CandidateTable } from "@/components/candidate-table"
-import { CandidateFilters } from "@/components/candidate-filters"
+"use client";
+
+import { useState } from "react";
+import { CandidateSearch } from "@/components/candidate-search";
+import { CandidateTable } from "@/components/candidate-table";
+import { CandidateFilters } from "@/components/candidate-filters";
 
 export default function CandidatesPage() {
+  const [filters, setFilters] = useState({ status: "all", language: "all", matchScore: 0 });
+
   return (
     <div className="space-y-6">
       <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
@@ -13,10 +18,10 @@ export default function CandidatesPage() {
         <CandidateSearch />
       </div>
 
-      <CandidateFilters />
+      {/* <CandidateFilters filters={filters} setFilters={setFilters} /> */}
+    
+      <CandidateTable filters={filters} />
 
-      <CandidateTable />
     </div>
-  )
+  );
 }
-

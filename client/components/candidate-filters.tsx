@@ -1,42 +1,64 @@
-"use client"
+"use client";
 
-import { Button } from "@/components/ui/button"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Slider } from "@/components/ui/slider"
-import { Badge } from "@/components/ui/badge"
-import { XIcon } from "lucide-react"
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Slider } from "@/components/ui/slider";
+import { Badge } from "@/components/ui/badge";
+import { XIcon } from "lucide-react";
 
-export function CandidateFilters() {
+interface CandidateFiltersProps {
+  filters: { status: string; language: string; matchScore: number };
+  setFilters: (filters: { status: string; language: string; matchScore: number }) => void;
+}
+
+export function CandidateFilters({ filters, setFilters }: CandidateFiltersProps) {
+  const handleChange = (key: string, value: string | number) => {
+    setFilters({ ...filters, [key]: value });
+  };
+
+  const clearFilters = () => {
+    setFilters({ status: "all", language: "all", matchScore: 0 });
+  };
+
   return (
     <div className="space-y-4">
+      {/* Active filters display */}
       <div className="flex flex-wrap gap-2">
-        <Badge variant="secondary" className="flex items-center gap-1">
-          Match Score: 70%+
-          <Button variant="ghost" size="icon" className="h-4 w-4 p-0">
-            <XIcon className="h-3 w-3" />
-          </Button>
-        </Badge>
-        <Badge variant="secondary" className="flex items-center gap-1">
-          Language: TypeScript
-          <Button variant="ghost" size="icon" className="h-4 w-4 p-0">
-            <XIcon className="h-3 w-3" />
-          </Button>
-        </Badge>
-        <Badge variant="secondary" className="flex items-center gap-1">
-          Status: Pending
-          <Button variant="ghost" size="icon" className="h-4 w-4 p-0">
-            <XIcon className="h-3 w-3" />
-          </Button>
-        </Badge>
-        <Button variant="ghost" size="sm" className="h-7">
+        {filters.matchScore > 0 && (
+          <Badge variant="secondary" className="flex items-center gap-1">
+            Match Score: {filters.matchScore}%+
+            <Button variant="ghost" size="icon" className="h-4 w-4 p-0" onClick={() => handleChange("matchScore", 0)}>
+              <XIcon className="h-3 w-3" />
+            </Button>
+          </Badge>
+        )}
+        {filters.language !== "all" && (
+          <Badge variant="secondary" className="flex items-center gap-1">
+            Language: {filters.language}
+            <Button variant="ghost" size="icon" className="h-4 w-4 p-0" onClick={() => handleChange("language", "all")}>
+              <XIcon className="h-3 w-3" />
+            </Button>
+          </Badge>
+        )}
+        {filters.status !== "all" && (
+          <Badge variant="secondary" className="flex items-center gap-1">
+            Status: {filters.status}
+            <Button variant="ghost" size="icon" className="h-4 w-4 p-0" onClick={() => handleChange("status", "all")}>
+              <XIcon className="h-3 w-3" />
+            </Button>
+          </Badge>
+        )}
+        <Button variant="ghost" size="sm" className="h-7" onClick={clearFilters}>
           Clear All
         </Button>
       </div>
 
+      {/* Filter controls */}
       <div className="grid gap-4 md:grid-cols-4">
         <div className="space-y-2">
           <label className="text-sm font-medium">Status</label>
-          <Select defaultValue="all">
+          <Select value={filters.status} onValueChange={(value) => handleChange("status", value)}>
             <SelectTrigger>
               <SelectValue placeholder="Select status" />
             </SelectTrigger>
@@ -50,7 +72,7 @@ export function CandidateFilters() {
 
         <div className="space-y-2">
           <label className="text-sm font-medium">Programming Language</label>
-          <Select defaultValue="all">
+          <Select value={filters.language} onValueChange={(value) => handleChange("language", value)}>
             <SelectTrigger>
               <SelectValue placeholder="Select language" />
             </SelectTrigger>
@@ -69,12 +91,11 @@ export function CandidateFilters() {
         <div className="space-y-2 md:col-span-2">
           <div className="flex items-center justify-between">
             <label className="text-sm font-medium">Match Score</label>
-            <span className="text-sm text-muted-foreground">70%+</span>
+            <span className="text-sm text-muted-foreground">{filters.matchScore}%+</span>
           </div>
-          <Slider defaultValue={[70]} max={100} step={5} />
+          <Slider value={[filters.matchScore]} max={100} step={5} onValueChange={(value) => handleChange("matchScore", value[0])} />
         </div>
       </div>
     </div>
-  )
+  );
 }
-

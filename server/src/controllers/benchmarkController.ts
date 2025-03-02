@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import { Benchmark } from "../models/Benchmark";
 import axios from "axios"
 import dotenv from "dotenv";
+import { updateMatchPercentForCandidates } from "../utils/matchPercentUtils";
 
 dotenv.config();
 const GITHUB_TOKEN = process.env.GITHUB_TOKEN; // Replace with your token
@@ -214,6 +215,8 @@ export const addBenchmark = async (req: Request, res: Response): Promise<void> =
             benchmark.updatedAt = new Date();
 
             await benchmark.save();
+            await updateMatchPercentForCandidates(companyId, benchmark);
+
             res.status(200).json({ message: "Benchmark updated", benchmark });
             return;
         }

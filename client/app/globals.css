@@ -20,7 +20,7 @@
     --accent-foreground: 240 5.9% 10%;
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 98%;
-    --border: 240 5.9% 90%;
+    --border: 240 5.9% 80%; /* Darker border for better visibility in light mode */
     --input: 240 5.9% 90%;
     --ring: 221.2 83.2% 53.3%;
     --radius: 0.5rem;
@@ -56,5 +56,10 @@
   body {
     @apply bg-background text-foreground;
   }
-}
 
+  /* Apply border-border only in dark mode */
+  
+
+  /* Apply 2px black border for light theme */
+  
+}

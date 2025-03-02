@@ -3,11 +3,8 @@
 import { useEffect, useState } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { MoreHorizontalIcon, Trash2Icon } from "lucide-react";
 import Link from "next/link";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 
 interface Candidate {
   _id: string;
@@ -16,7 +13,7 @@ interface Candidate {
   avatar: string;
   topLanguages: string[];
   status: string;
-  matchPercent: number;
+  matchPercentByCompany?: { companyId: string; matchPercent: number }[];
 }
 
 export function TopCandidatesTable() {
@@ -28,7 +25,9 @@ export function TopCandidatesTable() {
     async function fetchCandidates() {
       try {
         const token = localStorage.getItem("token");
-        if (!token) throw new Error("No token found, please log in.");
+        const companyId = localStorage.getItem("companyId");
+
+        if (!token || !companyId) throw new Error("No token or companyId found, please log in.");
 
         const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/candidates/`, {
           method: "GET",
@@ -40,6 +39,12 @@ export function TopCandidatesTable() {
 
         if (!res.ok) throw new Error("Failed to fetch candidates");
         let data: Candidate[] = await res.json();
+
+        // Extract company-specific matchPercent
+        data = data.map((candidate) => {
+          const companyMatch = candidate.matchPercentByCompany?.find((mp) => mp.companyId === companyId);
+          return { ...candidate, matchPercent: companyMatch ? companyMatch.matchPercent : 0 };
+        });
 
         // Sort candidates by matchPercent and get top 5
         data = data.sort((a, b) => b.matchPercent - a.matchPercent).slice(0, 5);
@@ -82,7 +87,7 @@ export function TopCandidatesTable() {
                 </Link>
               </TableCell>
               <TableCell>
-                <span>{candidate.matchPercent}</span>
+                <span>{candidate.matchPercent}%</span>
               </TableCell>
               <TableCell className="hidden md:table-cell">
                 <div className="flex flex-wrap gap-1">

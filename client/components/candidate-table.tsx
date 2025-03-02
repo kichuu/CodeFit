@@ -17,7 +17,8 @@ interface Candidate {
   avatar: string;
   topLanguages: string[];
   status: string;
-  matchPercent: number;
+  matchPercentByCompany?: { companyId: string; matchPercent: number }[];
+  matchPercent?: number;
 }
 
 export function CandidateTable() {
@@ -35,7 +36,9 @@ export function CandidateTable() {
     async function fetchCandidates() {
       try {
         const token = localStorage.getItem("token");
-        if (!token) throw new Error("No token found, please log in.");
+        const companyId = localStorage.getItem("companyId");
+
+        if (!token || !companyId) throw new Error("No token or companyId found, please log in.");
 
         const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/candidates/`, {
           method: "GET",
@@ -46,7 +49,14 @@ export function CandidateTable() {
         });
 
         if (!res.ok) throw new Error("Failed to fetch candidates");
-        const data: Candidate[] = await res.json();
+        let data: Candidate[] = await res.json();
+
+        // Extract company-specific matchPercent
+        data = data.map((candidate) => {
+          const companyMatch = candidate.matchPercentByCompany?.find((mp) => mp.companyId === companyId);
+          return { ...candidate, matchPercent: companyMatch ? companyMatch.matchPercent : 0 };
+        });
+
         setCandidates(data);
         setFilteredCandidates(data);
       } catch (err: any) {
@@ -64,6 +74,7 @@ export function CandidateTable() {
       return (
         (filters.status === "all" || candidate.status.toLowerCase() === filters.status) &&
         (filters.language === "all" || candidate.topLanguages.includes(filters.language)) &&
+        candidate.matchPercent !== undefined &&
         candidate.matchPercent >= filters.matchScore
       );
     });
@@ -75,22 +86,22 @@ export function CandidateTable() {
     try {
       const token = localStorage.getItem("token");
       if (!token) throw new Error("No token found, please log in.");
-  
-      const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/candidates/${username}/hired`, {
+
+      const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/candidates/${username}/Hired`, {
         method: "PATCH",
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
         },
       });
-  
+
       if (!res.ok) {
         const errorData = await res.json();
         throw new Error(errorData.message || "Failed to update status");
       }
-  
+
       const { candidate } = await res.json();
-  
+
       // Update UI with response data
       setCandidates((prev) =>
         prev.map((c) => (c.username === username ? { ...c, status: candidate.status } : c))
@@ -99,7 +110,6 @@ export function CandidateTable() {
       alert(err.message);
     }
   };
-  
 
   const deleteCandidate = async (username: string) => {
     if (!confirm(`Are you sure you want to delete ${username}?`)) return;
@@ -156,7 +166,7 @@ export function CandidateTable() {
               <TableCell>
                 <div className="flex items-center">
                   <span className="mr-2 h-2 w-2 rounded-full bg-gray-400"></span>
-                  <span>{candidate.matchPercent}</span>
+                  <span>{candidate.matchPercent}%</span>
                 </div>
               </TableCell>
               <TableCell className="hidden md:table-cell">

@@ -8,7 +8,6 @@ import { XIcon } from "lucide-react"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Candidate } from "@/app/compare/types"
 
-
 interface CompareSelectorProps {
   onCompare: (candidates: Candidate[]) => void
 }
@@ -19,8 +18,9 @@ export function CompareSelector({ onCompare }: CompareSelectorProps) {
 
   useEffect(() => {
     const token = localStorage.getItem("token")
-    if (!token) {
-      console.error("No auth token found")
+    const companyId = localStorage.getItem("companyId")
+    if (!token || !companyId) {
+      console.error("No auth token or companyId found")
       return
     }
 
@@ -30,7 +30,16 @@ export function CompareSelector({ onCompare }: CompareSelectorProps) {
       },
     })
       .then((res) => res.json())
-      .then((data) => setCandidates(data))
+      .then((data) => {
+        // For each candidate, extract the company-specific match percent.
+        const updatedData = data.map((candidate: Candidate) => {
+          const companyMatch = candidate.matchPercentByCompany?.find(
+            (mp: any) => mp.companyId === companyId
+          )
+          return { ...candidate, matchPercent: companyMatch ? companyMatch.matchPercent : 0 }
+        })
+        setCandidates(updatedData)
+      })
       .catch((err) => console.error("Error fetching candidates:", err))
   }, [])
 
@@ -39,14 +48,14 @@ export function CompareSelector({ onCompare }: CompareSelectorProps) {
     if (candidate && !selectedCandidates.some((c) => c.username === username)) {
       const updatedCandidates = [...selectedCandidates, candidate]
       setSelectedCandidates(updatedCandidates)
-      onCompare(updatedCandidates) // Call onCompare with updated list
+      onCompare(updatedCandidates) // Pass updated list to parent
     }
   }
 
   const removeCandidate = (username: string) => {
     const updatedCandidates = selectedCandidates.filter((c) => c.username !== username)
     setSelectedCandidates(updatedCandidates)
-    onCompare(updatedCandidates) // Call onCompare with updated list
+    onCompare(updatedCandidates) // Pass updated list to parent
   }
 
   return (

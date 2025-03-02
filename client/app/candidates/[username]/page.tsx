@@ -45,7 +45,7 @@ export default function CandidateProfile() {
           throw new Error("Authorization failed. Please log in again.")
 
         const response = await fetch(
-          `http://localhost:5000/api/candidates/${username}`,
+          `http://${process.env.NEXT_PUBLIC_BACKEND_URL}/api/candidates/${username}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,

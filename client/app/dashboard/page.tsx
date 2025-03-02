@@ -4,6 +4,7 @@ import { CandidateTable } from "@/components/candidate-table"
 import { DashboardStats } from "@/components/dashboard-stats"
 import { RecentActivity } from "@/components/recent-activity"
 import { SetBenchmarkForm } from "@/components/set-benchmark-form"
+import { TopCandidatesTable } from "@/components/TopCandidateTable"
 
 export default function Dashboard() {
   return (
@@ -13,9 +14,9 @@ export default function Dashboard() {
           <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
           <p className="text-muted-foreground">Overview of all analyzed candidates and recruiting metrics</p>
         </div>
-        <CandidateSearch />
+        {/* <CandidateSearch /> */}
       </div>
-
+      
       <DashboardStats />
 
       <div className="grid gap-6 md:grid-cols-7">
@@ -25,7 +26,7 @@ export default function Dashboard() {
             <CardDescription>Candidates with the highest match scores</CardDescription>
           </CardHeader>
           <CardContent>
-            <CandidateTable limit={5} />
+            <TopCandidatesTable/>
           </CardContent>
         </Card>
 

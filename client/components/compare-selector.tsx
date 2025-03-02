@@ -24,7 +24,7 @@ export function CompareSelector({ onCompare }: CompareSelectorProps) {
       return
     }
 
-    fetch("http://localhost:5000/api/candidates", {
+    fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/candidates`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },

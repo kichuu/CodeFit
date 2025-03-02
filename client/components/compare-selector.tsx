@@ -24,7 +24,7 @@ export function CompareSelector({ onCompare }: CompareSelectorProps) {
       return
     }
 
-    fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/candidates`, {
+    fetch(`https://codefit.onrender.com/api/candidates`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },

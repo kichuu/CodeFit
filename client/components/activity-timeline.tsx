@@ -19,7 +19,7 @@ export function ActivityTimeline({ username }: ActivityTimelineProps) {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const githubToken = process.env.NEXT_PUBLIC_GITHUB_TOKEN;
+    const githubToken = "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";
     if (!githubToken) {
       setError("GitHub token not found. Ensure NEXT_PUBLIC_GITHUB_TOKEN is set.");
       setLoading(false);

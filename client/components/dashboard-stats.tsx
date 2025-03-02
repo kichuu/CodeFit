@@ -4,7 +4,7 @@ import { useState, useEffect } from "react"
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
 import { UsersIcon, UserCheckIcon, BarChart3Icon, TrendingUpIcon } from "lucide-react"
 
-const API_URL = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/candidates`
+const API_URL = `https://codefit.onrender.com/api/candidates`
 
 export function DashboardStats() {
   const [stats, setStats] = useState<{ totalCandidates: number; hiredCandidates: number; averageMatchScore: string; hiringRate: string } | null>(null)

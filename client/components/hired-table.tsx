@@ -8,6 +8,11 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { MoreHorizontalIcon } from "lucide-react";
 import Link from "next/link";
 
+interface MatchPercent {
+  companyId: string;
+  matchPercent: number;
+}
+
 interface Candidate {
   _id: string;
   username: string;
@@ -16,20 +21,24 @@ interface Candidate {
   topLanguages: string[];
   status: string;
   matchPercent: number;
-  updatedAt: string; // Replacing hireDate with lastUpdated
+  updatedAt: string;
   position: string;
+  matchPercentByCompany: MatchPercent[];
 }
 
 export function HiredTable() {
   const [candidates, setCandidates] = useState<Candidate[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const companyId = typeof window !== "undefined" ? localStorage.getItem("companyId") : null; // Ensure we get it in client-side
 
   useEffect(() => {
     async function fetchCandidates() {
       try {
         const token = localStorage.getItem("token");
+
         if (!token) throw new Error("No token found, please log in.");
+        if (!companyId) throw new Error("No company ID found.");
 
         const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/candidates/`, {
           method: "GET",
@@ -53,7 +62,7 @@ export function HiredTable() {
     }
 
     fetchCandidates();
-  }, []);
+  }, [companyId]);
 
   if (loading) return <p>Loading hired candidates...</p>;
   if (error) return <p className="text-red-500">Error: {error}</p>;
@@ -68,58 +77,62 @@ export function HiredTable() {
             <TableHead>Position</TableHead>
             <TableHead>Match Score</TableHead>
             <TableHead className="hidden md:table-cell">Key Skills</TableHead>
-            <TableHead>Last Updated</TableHead> {/* Changed from Hire Date */}
+            <TableHead>Last Updated</TableHead>
             <TableHead className="w-[50px]"></TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
-          {candidates.map((candidate) => (
-            <TableRow key={candidate._id}>
-              <TableCell>
-                <Link href={`/candidates/${candidate.username}`} className="flex items-center gap-3 hover:underline">
-                  <Avatar className="h-8 w-8">
-                    <AvatarImage src={candidate.avatar} alt={candidate.name} />
-                    <AvatarFallback>{candidate.name.substring(0, 2).toUpperCase()}</AvatarFallback>
-                  </Avatar>
-                  <div>
-                    <div className="font-medium">{candidate.name}</div>
-                    <div className="text-xs text-muted-foreground">@{candidate.username}</div>
+          {candidates.map((candidate) => {
+            // Calculate the match score for the current company
+            const companyMatch = candidate.matchPercentByCompany.find((m) => m.companyId === companyId);
+            const matchScore = companyMatch ? companyMatch.matchPercent : candidate.matchPercent;
+
+            return (
+              <TableRow key={candidate._id}>
+                <TableCell>
+                  <Link href={`/candidates/${candidate.username}`} className="flex items-center gap-3 hover:underline">
+                    <Avatar className="h-8 w-8">
+                      <AvatarImage src={candidate.avatar} alt={candidate.name} />
+                      <AvatarFallback>{candidate.name.substring(0, 2).toUpperCase()}</AvatarFallback>
+                    </Avatar>
+                    <div>
+                      <div className="font-medium">{candidate.name}</div>
+                      <div className="text-xs text-muted-foreground">@{candidate.username}</div>
+                    </div>
+                  </Link>
+                </TableCell>
+                <TableCell>{candidate.position}</TableCell>
+                <TableCell>
+                  <div className="flex items-center">
+                    <span
+                      className={`mr-2 h-2 w-2 rounded-full ${
+                        matchScore >= 90 ? "bg-green-500" : matchScore >= 80 ? "bg-yellow-500" : "bg-red-500"
+                      }`}
+                    ></span>
+                    <span>{matchScore}%</span>
                   </div>
-                </Link>
-              </TableCell>
-              <TableCell>{candidate.position}</TableCell>
-              <TableCell>
-                <div className="flex items-center">
-                  <span
-                    className={`mr-2 h-2 w-2 rounded-full ${
-                      candidate.matchPercent >= 90
-                        ? "bg-green-500"
-                        : candidate.matchPercent >= 80
-                        ? "bg-yellow-500"
-                        : "bg-red-500"
-                    }`}
-                  ></span>
-                  <span>{candidate.matchPercent}%</span>
-                </div>
-              </TableCell>
-              <TableCell className="hidden md:table-cell">
-                <div className="flex flex-wrap gap-1">
-                  {candidate.topLanguages.slice(0, 2).map((skill) => (
-                    <Badge key={skill} variant="outline">
-                      {skill}
-                    </Badge>
-                  ))}
-                  {candidate.topLanguages.length > 2 && <Badge variant="outline">+{candidate.topLanguages.length - 2}</Badge>}
-                </div>
-              </TableCell>
-              <TableCell>{new Date(candidate.updatedAt).toLocaleDateString()}</TableCell> {/* Changed Hire Date */}
-              <TableCell>
-                <Button variant="ghost" size="icon">
-                  <MoreHorizontalIcon className="h-4 w-4" />
-                </Button>
-              </TableCell>
-            </TableRow>
-          ))}
+                </TableCell>
+                <TableCell className="hidden md:table-cell">
+                  <div className="flex flex-wrap gap-1">
+                    {candidate.topLanguages.slice(0, 2).map((skill) => (
+                      <Badge key={skill} variant="outline">
+                        {skill}
+                      </Badge>
+                    ))}
+                    {candidate.topLanguages.length > 2 && (
+                      <Badge variant="outline">+{candidate.topLanguages.length - 2}</Badge>
+                    )}
+                  </div>
+                </TableCell>
+                <TableCell>{new Date(candidate.updatedAt).toLocaleDateString()}</TableCell>
+                <TableCell>
+                  <Button variant="ghost" size="icon">
+                    <MoreHorizontalIcon className="h-4 w-4" />
+                  </Button>
+                </TableCell>
+              </TableRow>
+            );
+          })}
         </TableBody>
       </Table>
     </div>

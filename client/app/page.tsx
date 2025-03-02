@@ -27,7 +27,7 @@ export default function LandingPage() {
         <div className="container flex h-16 items-center justify-between px-4 md:px-6">
           <div className="flex items-center gap-2">
             <Github className="h-6 w-6" />
-            <span className="text-xl font-bold">GitHub Recruiter</span>
+            <span className="text-xl font-bold">CodeFit</span>
           </div>
           
           {/* Desktop Navigation */}
@@ -144,7 +144,7 @@ export default function LandingPage() {
                       <div className="w-3 h-3 rounded-full bg-red-500"></div>
                       <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
                       <div className="w-3 h-3 rounded-full bg-green-500"></div>
-                      <div className="ml-2 text-xs text-gray-400">GitHub Recruiter</div>
+                      <div className="ml-2 text-xs text-gray-400">CodeFit</div>
                     </div>
                     <div className="space-y-3">
                       <div className="h-6 w-3/4 bg-white/10 rounded"></div>
@@ -171,7 +171,7 @@ export default function LandingPage() {
             <div className="space-y-2">
               <h2 className="text-3xl font-bold tracking-tighter md:text-4xl/tight">Trusted by tech teams worldwide</h2>
               <p className="max-w-[900px] text-gray-300 md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
-                Join hundreds of companies using GitHub Recruiter to find and hire top developer talent.
+                Join hundreds of companies using CodeFit to find and hire top developer talent.
               </p>
             </div>
           </div>
@@ -223,7 +223,7 @@ export default function LandingPage() {
             <div className="space-y-2">
               <h2 className="text-3xl font-bold tracking-tighter sm:text-5xl">Powerful AI-driven features</h2>
               <p className="max-w-[900px] text-gray-300 md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
-                GitHub Recruiter analyzes repositories, contributions, and coding patterns to find the perfect match for
+                CodeFit analyzes repositories, contributions, and coding patterns to find the perfect match for
                 your team.
               </p>
             </div>
@@ -397,7 +397,7 @@ export default function LandingPage() {
             <div className="space-y-2">
               <h2 className="text-3xl font-bold tracking-tighter sm:text-5xl">What our customers say</h2>
               <p className="max-w-[900px] text-gray-300 md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
-                Hear from the teams who've transformed their hiring process with GitHub Recruiter.
+                Hear from the teams who've transformed their hiring process with CodeFit.
               </p>
             </div>
           </div>
@@ -406,7 +406,7 @@ export default function LandingPage() {
               <CardContent className="p-6 space-y-4">
                 <div className="h-1 w-16 bg-gradient-to-r from-gray-500 to-zinc-600 rounded-full mb-4"></div>
                 <p className="italic text-gray-300">
-                  "GitHub Recruiter has cut our hiring time in half. The AI insights helped us find developers who were
+                  "CodeFit has cut our hiring time in half. The AI insights helped us find developers who were
                   a perfect fit for our team."
                 </p>
                 <div className="flex items-center gap-4 pt-4 border-t border-white/10">
@@ -494,7 +494,7 @@ export default function LandingPage() {
             <div className="space-y-4">
               <div className="flex items-center gap-2">
                 <Github className="h-5 w-5" />
-                <span className="text-lg font-bold">GitHub Recruiter</span>
+                <span className="text-lg font-bold">CodeFit</span>
               </div>
               <p className="text-sm text-gray-300">
                 AI-powered GitHub recruiting and matching platform for tech teams.
@@ -557,7 +557,7 @@ export default function LandingPage() {
             </div>
           </div>
           <div className="mt-8 border-t border-white/10 pt-8 text-center text-sm text-gray-300">
-            &copy; {new Date().getFullYear()} GitHub Recruiter. All rights reserved.
+            &copy; {new Date().getFullYear()} CodeFit. All rights reserved.
           </div>
         </div>
       </footer>

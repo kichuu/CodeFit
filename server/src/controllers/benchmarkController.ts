@@ -182,61 +182,61 @@ function calculateCommitQuality(commitMessages: string[]): number {
     
 
 
-export const addBenchmark = async (req: Request, res: Response): Promise<void> => {
-    try {
-        const { githubUrl, companyId } = req.body;
-        const username = githubUrl.split("/").pop();
-
-        if (!username) {
-            res.status(400).json({ message: "Invalid GitHub URL" });
-            return;
-        }
-
-        // Fetch GitHub profile and repository data
-        const gitHubData = await fetchGitHubData(username);
-        if (!gitHubData) {
-            res.status(500).json({ message: "Failed to fetch GitHub data" });
-            return;
-        }
-
-        // Check if a benchmark already exists for this company
-        let benchmark = await Benchmark.findOne({ companyIds: companyId });
-
-        if (benchmark) {
-            // Update existing benchmark
-            benchmark.topLanguages = gitHubData.topLanguages;
-            benchmark.totalCommits = gitHubData.totalCommits;
-            benchmark.totalPRs = gitHubData.totalPRs;
-            benchmark.totalIssues = gitHubData.totalIssues;
-            benchmark.commitQualityScore = gitHubData.commitQualityScore;
-            benchmark.openSourceContributed = gitHubData.openSourceContributed;
-            benchmark.totalRepos = gitHubData.totalRepos;
-            benchmark.codeReviewThoroughness = gitHubData.codeReviewThoroughness;
-            benchmark.updatedAt = new Date();
-
-            await benchmark.save();
-            await updateMatchPercentForCandidates(companyId, benchmark);
-
-            res.status(200).json({ message: "Benchmark updated", benchmark });
-            return;
-        }
-
-        // Create a new benchmark
-        const newBenchmark = new Benchmark({
-            topLanguages: gitHubData.topLanguages,
-            totalCommits: gitHubData.totalCommits,
-            totalPRs: gitHubData.totalPRs,
-            totalIssues: gitHubData.totalIssues,
-            commitQualityScore: gitHubData.commitQualityScore,
-            openSourceContributed: gitHubData.openSourceContributed,
-            totalRepos: gitHubData.totalRepos,
-            codeReviewThoroughness: gitHubData.codeReviewThoroughness,
-            companyIds: [companyId],
-        });
-
-        await newBenchmark.save();
-        res.status(201).json({ message: "Benchmark created", benchmark: newBenchmark });
-    } catch (error) {
-        res.status(500).json({ message: (error as Error).message });
-    }
-};
+    export const addBenchmark = async (req: Request, res: Response): Promise<void> => {
+      try {
+          const { githubUrl, companyId } = req.body;
+          const username = githubUrl.split("/").pop();
+  
+          if (!username) {
+              res.status(400).json({ message: "Invalid GitHub URL" });
+              return;
+          }
+  
+          // Fetch GitHub profile and repository data
+          const gitHubData = await fetchGitHubData(username);
+          if (!gitHubData) {
+              res.status(500).json({ message: "Failed to fetch GitHub data" });
+              return;
+          }
+  
+          let benchmark = await Benchmark.findOne({ companyIds: companyId });
+  
+          if (benchmark) {
+              // Update existing benchmark
+              benchmark.topLanguages = gitHubData.topLanguages;
+              benchmark.totalCommits = gitHubData.totalCommits;
+              benchmark.totalPRs = gitHubData.totalPRs;
+              benchmark.totalIssues = gitHubData.totalIssues;
+              benchmark.commitQualityScore = gitHubData.commitQualityScore;
+              benchmark.openSourceContributed = gitHubData.openSourceContributed;
+              benchmark.totalRepos = gitHubData.totalRepos;
+              benchmark.codeReviewThoroughness = gitHubData.codeReviewThoroughness;
+              benchmark.updatedAt = new Date();
+  
+              await benchmark.save();
+          } else {
+              // Create a new benchmark
+              benchmark = new Benchmark({
+                  topLanguages: gitHubData.topLanguages,
+                  totalCommits: gitHubData.totalCommits,
+                  totalPRs: gitHubData.totalPRs,
+                  totalIssues: gitHubData.totalIssues,
+                  commitQualityScore: gitHubData.commitQualityScore,
+                  openSourceContributed: gitHubData.openSourceContributed,
+                  totalRepos: gitHubData.totalRepos,
+                  codeReviewThoroughness: gitHubData.codeReviewThoroughness,
+                  companyIds: [companyId],
+              });
+  
+              await benchmark.save();
+          }
+  
+          // Update match percentages for existing candidates
+          await updateMatchPercentForCandidates(companyId, benchmark);
+  
+          res.status(200).json({ message: "Benchmark updated", benchmark });
+      } catch (error) {
+          res.status(500).json({ message: (error as Error).message });
+      }
+  };
+  

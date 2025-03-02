@@ -1,3 +1,5 @@
+"use client";
+
 import React from "react";
 import {
   Table,
@@ -23,7 +25,7 @@ interface Candidate {
   topLanguages: string[];
   teamProjects: number;
   avgPRSize: string;
-  matchPercent:number;
+  matchPercent: number;
 }
 
 interface CompareTableProps {
@@ -91,7 +93,7 @@ export function CompareTable({ candidates }: CompareTableProps) {
         {categories.map((section) => (
           <React.Fragment key={section.category}>
             <TableRow>
-              <TableCell colSpan={candidates.length + 1} className=" font-semibold text-lg py-2">
+              <TableCell colSpan={candidates.length + 1} className="font-semibold text-lg py-2">
                 {section.category}
               </TableCell>
             </TableRow>
@@ -100,33 +102,31 @@ export function CompareTable({ candidates }: CompareTableProps) {
                 <TableCell>{metric}</TableCell>
                 {candidates.map((candidate) => (
                   <TableCell key={candidate.username} className="text-center">
-                    {
-                      metric === "Match Score"
-                        ? candidate.matchPercent
-                        : metric === "GitHub Member Since"
-                        ? formatDate(candidate.joinedGithub)
-                        : metric === "Repositories"
-                        ? candidate.totalRepos
-                        : metric === "Commits (Last Year)"
-                        ? candidate.totalCommits
-                        : metric === "Pull Requests (Last Year)"
-                        ? candidate.totalPRs
-                        : metric === "Issues (Last Year)"
-                        ? candidate.totalIssues
-                        : metric === "Code Review Thoroughness"
-                        ? candidate.codeReviewThoroughness
-                        : metric === "Primary Language"
-                        ? candidate.topLanguages[0]
-                        : metric === "Secondary Languages"
-                        ? candidate.topLanguages.slice(1).join(", ")
-                        : metric === "Open Source Contributions"
-                        ? candidate.openSourceContributed
-                        : metric === "Team Projects"
-                        ? candidate.teamProjects
-                        : metric === "Average PR Size"
-                        ? candidate.avgPRSize
-                        : "N/A"
-                    }
+                    {metric === "Match Score"
+                      ? candidate.matchPercent
+                      : metric === "GitHub Member Since"
+                      ? formatDate(candidate.joinedGithub)
+                      : metric === "Repositories"
+                      ? candidate.totalRepos
+                      : metric === "Commits (Last Year)"
+                      ? candidate.totalCommits
+                      : metric === "Pull Requests (Last Year)"
+                      ? candidate.totalPRs
+                      : metric === "Issues (Last Year)"
+                      ? candidate.totalIssues
+                      : metric === "Code Review Thoroughness"
+                      ? candidate.codeReviewThoroughness
+                      : metric === "Primary Language"
+                      ? candidate.topLanguages[0]
+                      : metric === "Secondary Languages"
+                      ? candidate.topLanguages.slice(1).join(", ")
+                      : metric === "Open Source Contributions"
+                      ? candidate.openSourceContributed
+                      : metric === "Team Projects"
+                      ? candidate.teamProjects
+                      : metric === "Average PR Size"
+                      ? candidate.avgPRSize
+                      : "N/A"}
                   </TableCell>
                 ))}
               </TableRow>

@@ -22,8 +22,12 @@ const candidateSchema = new mongoose.Schema(
     codeReviewThoroughness:{type: String, enum: ["low", "medium", "high"] ,default: "medium"},
     // teamProjects : {type:Number},
     companyIds: [{ type: mongoose.Schema.Types.ObjectId, ref: "Company" }], // Companies that have access to this candidate
-    matchPercent: {type:Number},
-    createdAt: { type: Date, default: Date.now },
+    matchPercentByCompany: [
+      {
+        companyId: { type: mongoose.Schema.Types.ObjectId, ref: "Company" },
+        matchPercent: { type: Number, default: 0 },
+      },
+    ],    createdAt: { type: Date, default: Date.now },
     updatedAt: { type: Date, default: Date.now },
   },
   { timestamps: true }

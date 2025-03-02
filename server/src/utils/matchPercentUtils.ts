@@ -12,8 +12,19 @@ export const updateMatchPercentForCandidates = async (companyId: string, benchma
         // Calculate the match percentage
         const matchPercent = calculateMatchPercent(candidate, benchmark);
 
-        // Update the candidate's match percentage
-        candidate.matchPercent = matchPercent;
+        // Find the index where the company match percent is stored
+        const existingMatchIndex = candidate.matchPercentByCompany.findIndex(
+            (mp) => mp.companyId && mp.companyId.toString() === companyId
+        );
+
+        if (existingMatchIndex !== -1) {
+            // Update existing entry
+            candidate.matchPercentByCompany[existingMatchIndex].matchPercent = matchPercent;
+        } else {
+            // Add new entry
+            candidate.matchPercentByCompany.push({ companyId, matchPercent });
+        }
+
         await candidate.save();
     }
 };

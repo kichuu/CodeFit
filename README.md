@@ -37,10 +37,10 @@ Ensure you have the following installed on your system:
 1. *Clone the repository*:
    bash
    git clone https://github.com/kichuu/CodeFit/
-   cd candidate-recruiting-app
+   cd CodeFit
    
 2. *Install dependencies*:
-   bash
+   for both client and server
    npm install
    
 3. *Set up environment variables*:

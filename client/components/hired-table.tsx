@@ -31,7 +31,7 @@ export function HiredTable() {
         const token = localStorage.getItem("token");
         if (!token) throw new Error("No token found, please log in.");
 
-        const res = await fetch("http://localhost:5000/api/candidates/", {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/candidates/`, {
           method: "GET",
           headers: {
             Authorization: `Bearer ${token}`,

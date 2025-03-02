@@ -30,7 +30,7 @@ export default function Dashboard() {
           </CardContent>
         </Card>
 
-        <Card className="md:col-span-3">
+        {/* <Card className="md:col-span-3">
           <CardHeader>
             <CardTitle>Recent Activity</CardTitle>
             <CardDescription>Latest candidate analyses and updates</CardDescription>
@@ -38,9 +38,9 @@ export default function Dashboard() {
           <CardContent>
             <RecentActivity />
           </CardContent>
-        </Card>
+        </Card> */}
 
-        <Card className="md:col-span-3">
+        <Card className="md:col-span-3 h-fit">
           <CardHeader>
             <CardTitle>Set Benchmark</CardTitle>
             <CardDescription>Use a GitHub profile as a benchmark for candidate comparisons</CardDescription>

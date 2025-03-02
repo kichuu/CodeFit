@@ -37,7 +37,7 @@ export function CandidateTable() {
         const token = localStorage.getItem("token");
         if (!token) throw new Error("No token found, please log in.");
 
-        const res = await fetch("http://localhost:5000/api/candidates/", {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/candidates/`, {
           method: "GET",
           headers: {
             Authorization: `Bearer ${token}`,
@@ -76,7 +76,7 @@ export function CandidateTable() {
       const token = localStorage.getItem("token");
       if (!token) throw new Error("No token found, please log in.");
   
-      const res = await fetch(`http://localhost:5000/api/candidates/${username}/hired`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/candidates/${username}/hired`, {
         method: "PATCH",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -108,7 +108,7 @@ export function CandidateTable() {
       const token = localStorage.getItem("token");
       if (!token) throw new Error("No token found, please log in.");
 
-      const res = await fetch(`http://localhost:5000/api/candidates/${username}`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/candidates/${username}`, {
         method: "DELETE",
         headers: {
           Authorization: `Bearer ${token}`,

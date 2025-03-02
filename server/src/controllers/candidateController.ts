@@ -9,6 +9,7 @@ dotenv.config();
 import axios from "axios";
 import { Company } from "../models/Company";
 import { Benchmark } from "../models/Benchmark";
+import { calculateMatchPercent } from "../utils/calculateMatchPercent";
 
 const GITHUB_TOKEN = process.env.GITHUB_TOKEN; // Replace with your token
 
@@ -264,30 +265,7 @@ export async function fetchGitHubData(username: string): Promise<GitHubData | nu
 };
 
 // Function to calculate match percentage
-const calculateMatchPercent = (gitHubData: any, benchmark: any): number => {
-    const weightCommits = 0.6;
-    const weightPRs = 0.2;
-    const weightIssues = 0.2;
 
-    const commitScore = gitHubData.totalCommits >= benchmark.totalCommits 
-        ? 100 
-        : (gitHubData.totalCommits / benchmark.totalCommits) * 100;
-
-    const prScore = gitHubData.totalPRs >= benchmark.totalPRs 
-        ? 100 
-        : (gitHubData.totalPRs / benchmark.totalPRs) * 100;
-
-    const issueScore = gitHubData.totalIssues >= benchmark.totalIssues 
-        ? 100 
-        : (gitHubData.totalIssues / benchmark.totalIssues) * 100;
-
-    const matchPercent = 
-        (commitScore * weightCommits) +
-        (prScore * weightPRs) +
-        (issueScore * weightIssues);
-
-    return Math.round(matchPercent);
-};
 
 
   

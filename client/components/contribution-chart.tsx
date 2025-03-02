@@ -25,7 +25,7 @@ export function ContributionChart({ username }: ContributionChartProps) {
       try {
         setLoading(true);
 
-        const githubToken = process.env.NEXT_PUBLIC_GITHUB_TOKEN;
+        const githubToken = "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";
         if (!githubToken) {
           throw new Error("GitHub token not found. Ensure NEXT_PUBLIC_GITHUB_TOKEN is set in your environment.");
         }

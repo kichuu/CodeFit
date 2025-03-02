@@ -21,7 +21,7 @@ export function SetBenchmarkForm() {
     setLoading(true)
 
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/benchmark/`, {
+      const response = await fetch(`https://codefit.onrender.com/api/benchmark/`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

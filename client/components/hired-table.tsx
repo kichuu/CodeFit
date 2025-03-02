@@ -40,7 +40,7 @@ export function HiredTable() {
         if (!token) throw new Error("No token found, please log in.");
         if (!companyId) throw new Error("No company ID found.");
 
-        const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/candidates/`, {
+        const res = await fetch(`https://codefit.onrender.com/api/candidates/`, {
           method: "GET",
           headers: {
             Authorization: `Bearer ${token}`,

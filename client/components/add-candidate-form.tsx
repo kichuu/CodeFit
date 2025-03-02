@@ -23,7 +23,7 @@ export function AddCandidateForm() {
     try {
       const token = localStorage.getItem("token") || "" // Fetch JWT from localStorage
 
-      const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/candidates/`, {
+      const response = await fetch(`https://codefit.onrender.com/api/candidates/`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -43,7 +43,7 @@ export function AddCandidateForm() {
       setGithubLink("") // Clear input field
 
       // Redirect to the candidate page
-      router.push(`http://localhost:3000/candidates/${username}`)
+      router.push(`/candidates/${username}`)
     } catch (error) {
       console.error("Error:", error)
     } finally {

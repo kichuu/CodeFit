@@ -6,7 +6,6 @@ import { CandidateTable } from "@/components/candidate-table";
 import { CandidateFilters } from "@/components/candidate-filters";
 
 export default function CandidatesPage() {
-  console.log(process.env.NEXT_PUBLIC_BACKEND_URL)
   const [filters, setFilters] = useState({ status: "all", language: "all", matchScore: 0 });
 
   return (

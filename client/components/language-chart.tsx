@@ -20,7 +20,7 @@ export function LanguageChart({ username }: LanguageChartProps) {
       try {
         setLoading(true);
 
-        const token = process.env.NEXT_PUBLIC_GITHUB_TOKEN;
+        const token = "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";
         const headers: HeadersInit = token ? { Authorization: `token ${token}` } : {};
 
         const reposResponse = await fetch(`https://api.github.com/users/${username}/repos`, { headers });

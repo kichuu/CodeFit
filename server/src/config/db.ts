@@ -3,7 +3,7 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
-const MONGO_URI = process.env.MONGO_URI || "mongodb://localhost:27017/github-hiring";
+const MONGO_URI = process.env.MONGO_URI || "mongodb+srv://krishnadevr07:xffVEo7iFq5lyMfd@cluster0.wc88p.mongodb.net/codefit?retryWrites=true&w=majority&appName=Cluster0";
 
 export const connectDB = async () => {
   try {

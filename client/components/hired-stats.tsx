@@ -22,7 +22,7 @@ export function HiredStats() {
 
         if (!token || !companyId) throw new Error("Missing authentication details.");
 
-        const res = await fetch(`https://codefit.onrender.com/api/candidates/`, {
+        const res = await fetch(`https://codefit-8ggk.onrender.com/api/candidates/`, {
           method: "GET",
           headers: {
             Authorization: `Bearer ${token}`,

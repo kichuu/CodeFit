@@ -45,7 +45,7 @@ export default function CandidateProfile() {
           throw new Error("Authorization failed. Please log in again.")
 
         const response = await fetch(
-          `https://codefit.onrender.com/api/candidates/${username}`,
+          `https://codefit-8ggk.onrender.com/api/candidates/${username}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,

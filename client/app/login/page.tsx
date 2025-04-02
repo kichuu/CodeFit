@@ -3,6 +3,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import Cookies from "js-cookie"
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { GitHubLogoIcon } from "@radix-ui/react-icons";
@@ -23,7 +24,7 @@ export default function LoginPage() {
     setLoading(true);
 
     try {
-      const response = await fetch(`https://codefit.onrender.com/api/auth/login`, {
+      const response = await fetch(`https://codefit-8ggk.onrender.com/api/auth/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -38,6 +39,7 @@ export default function LoginPage() {
 
       alert("Login successful");
       localStorage.setItem("token", data.token);
+      Cookies.set("token", data.token, { expires: 7, secure: true });
       localStorage.setItem("companyId", data.companyId);
       localStorage.setItem("name", data.name);
       localStorage.setItem("email", data.email);

@@ -40,7 +40,7 @@ export function CandidateTable() {
 
         if (!token || !companyId) throw new Error("No token or companyId found, please log in.");
 
-        const res = await fetch(`https://codefit.onrender.com/api/candidates/`, {
+        const res = await fetch(`https://codefit-8ggk.onrender.com/api/candidates/`, {
           method: "GET",
           headers: {
             Authorization: `Bearer ${token}`,
@@ -87,7 +87,7 @@ export function CandidateTable() {
       const token = localStorage.getItem("token");
       if (!token) throw new Error("No token found, please log in.");
 
-      const res = await fetch(`https://codefit.onrender.com/api/candidates/${username}/Hired`, {
+      const res = await fetch(`https://codefit-8ggk.onrender.com/api/candidates/${username}/Hired`, {
         method: "PATCH",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -118,7 +118,7 @@ export function CandidateTable() {
       const token = localStorage.getItem("token");
       if (!token) throw new Error("No token found, please log in.");
 
-      const res = await fetch(`https://codefit.onrender.com/api/candidates/${username}`, {
+      const res = await fetch(`https://codefit-8ggk.onrender.com/api/candidates/${username}`, {
         method: "DELETE",
         headers: {
           Authorization: `Bearer ${token}`,

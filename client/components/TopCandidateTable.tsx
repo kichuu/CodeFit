@@ -29,7 +29,7 @@ export function TopCandidatesTable() {
 
         if (!token || !companyId) throw new Error("No token or companyId found, please log in.");
 
-        const res = await fetch(`https://codefit.onrender.com/api/candidates/`, {
+        const res = await fetch(`https://codefit-8ggk.onrender.com/api/candidates/`, {
           method: "GET",
           headers: {
             Authorization: `Bearer ${token}`,

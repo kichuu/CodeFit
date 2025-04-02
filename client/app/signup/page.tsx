@@ -31,7 +31,7 @@ export default function SignupPage() {
 
     try {
       setLoading(true);
-      const response = await fetch(`https://codefit.onrender.com/api/auth/register`, {
+      const response = await fetch(`https://codefit-8ggk.onrender.com/api/auth/register`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

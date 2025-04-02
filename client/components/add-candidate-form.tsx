@@ -23,7 +23,7 @@ export function AddCandidateForm() {
     try {
       const token = localStorage.getItem("token") || "" // Fetch JWT from localStorage
 
-      const response = await fetch(`https://codefit.onrender.com/api/candidates/`, {
+      const response = await fetch(`https://codefit-8ggk.onrender.com/api/candidates/`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

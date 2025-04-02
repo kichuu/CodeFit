@@ -25,7 +25,7 @@ export function ContributionChart({ username }: ContributionChartProps) {
       try {
         setLoading(true);
 
-        const githubToken = "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";
+        const githubToken = "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";
         if (!githubToken) {
           throw new Error("GitHub token not found. Ensure NEXT_PUBLIC_GITHUB_TOKEN is set in your environment.");
         }

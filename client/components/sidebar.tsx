@@ -1,5 +1,5 @@
 "use client"
-
+import Cookies from "js-cookie"
 import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
 import {
@@ -52,6 +52,7 @@ export function Sidebar() {
   ]
 
   const handleLogout = () => {
+    Cookies.remove("token")
     localStorage.clear()
     router.push("/")
   }
